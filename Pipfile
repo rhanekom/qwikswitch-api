@@ -5,6 +5,9 @@ name = "pypi"
 
 [packages]
 hatch = "*"
+requests = "*"
+pytest = "*"
+requests-mock = "*"
 
 [dev-packages]
 
