@@ -18,7 +18,7 @@ def test_generate_api_keys_with_valid_credentials_returns_keys(mock_api):
 
     assert keys is not None
     assert keys.read_key == response['r']
-    assert keys.read_write_key() == response['rw']
+    assert keys.read_write_key == response['rw']
 
 
 def test_generate_api_keys_with_error_throws_exception(mock_api):

@@ -8,6 +8,8 @@ hatch = "*"
 requests = "*"
 pytest = "*"
 requests-mock = "*"
+pytest-cov = "*"
+pytest-flakes = "*"
 
 [dev-packages]
 
