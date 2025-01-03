@@ -1,10 +1,10 @@
 import pytest
 
-from src.qwikswitchapi.qsapi import QSApi
-from src.qwikswitchapi.qsexception import QSException
+from src.qwikswitchapi.qs_api import QSApi
+from src.qwikswitchapi.qs_exception import QSException
 
 
-def test_generate_api_keys_with_valid_credentials_returns_keys(mock_api):
+def test_with_valid_credentials_returns_keys(mock_api):
     response = {
         "ok": 1,
         "r": "aaaa-bbbb-cccc-dddd",
@@ -21,7 +21,7 @@ def test_generate_api_keys_with_valid_credentials_returns_keys(mock_api):
     assert keys.read_write_key == response['rw']
 
 
-def test_generate_api_keys_with_error_throws_exception(mock_api):
+def test_with_error_throws_exception(mock_api):
     response = {
         "ok": 0,
         "err": "Please provide a valid serial key and email address of the registered owner."
@@ -34,7 +34,7 @@ def test_generate_api_keys_with_error_throws_exception(mock_api):
     with pytest.raises(QSException):
         api.generate_api_keys()
 
-def test_generate_api_keys_with_unknown_error_throws_exception(mock_api):
+def test_with_unknown_error_throws_exception(mock_api):
     response = {
         "ok": 0
     }
@@ -46,7 +46,7 @@ def test_generate_api_keys_with_unknown_error_throws_exception(mock_api):
     with pytest.raises(QSException):
         api.generate_api_keys()
 
-def test_generate_api_keys_with_invalid_credentials_unknown_eror_throws_exception(mock_api):
+def test_with_invalid_credentials_unknown_error_throws_exception(mock_api):
     mock_api.post('https://qwikswitch.com/api/v1/keys', status_code=401)
 
     api = QSApi('email', 'master_key')
