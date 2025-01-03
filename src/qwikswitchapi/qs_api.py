@@ -35,10 +35,6 @@ class QSApi:
         try:
             resp = requests.get(url)
             json_resp = QSApi._parse_response(resp)
-
-            if not json_resp['success']:
-                QSApi._raise_request_error(resp)
-
             return ControlResult.from_json(json_resp)
         except RequestException as ex:
             QSApi._raise_request_failure(url, ex)
@@ -53,6 +49,8 @@ class QSApi:
         if 'err' in json_resp:
             QSApi._raise_request_error(resp)
         if 'ok' in json_resp and json_resp['ok'] == 0:
+            QSApi._raise_request_error(resp)
+        if 'success' in json_resp and not json_resp['success']:
             QSApi._raise_request_error(resp)
         if 'error' in json_resp and "No Data" not in json_resp['error']:
             QSApi._raise_request_error(resp)
