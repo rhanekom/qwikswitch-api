@@ -18,6 +18,8 @@ class Constants:
         FIRMWARE = 'firmware'
         EPOCH = 'epoch'
         VALUE = 'value'
+        EMAIL = 'email'
+        MASTER_KEY = 'masterKey'
 
     class DeviceClass(Enum):
         relay = 1

@@ -50,8 +50,8 @@ class QSApi:
 
         url = UrlBuilder.build_generate_api_keys_url(self._base_uri)
         req = {
-            'email': self._email,
-            'master_key': self._master_key
+            Constants.JsonKeys.EMAIL: self._email,
+            Constants.JsonKeys.MASTER_KEY: self._master_key
         }
 
         try:
@@ -70,8 +70,8 @@ class QSApi:
 
         url = UrlBuilder.build_delete_api_keys_url(self._base_uri)
         req = {
-            'email': self._email,
-            'master_key': self._master_key
+            Constants.JsonKeys.EMAIL: self._email,
+            Constants.JsonKeys.MASTER_KEY: self._master_key
         }
 
         try:
