@@ -16,6 +16,14 @@ Device history is *not* implemented in this library yet as I don't have access t
 
 If you have access to devices that record history, please open an issue detailing sample responses from `get_all_device_status` and the history calls. 
 
+### Installation
+
+```bash
+pip install qwikswitch-api
+```
+
+### Sample code
+
 Sample usage to control a device:
 
 ```python

@@ -11,6 +11,7 @@ requests-mock = "*"
 pytest-cov = "*"
 pytest-flakes = "*"
 build = "*"
+twine = "*"
 
 [dev-packages]
 
