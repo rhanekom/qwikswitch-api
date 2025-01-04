@@ -36,6 +36,6 @@ class DeviceStatuses:
 
         for key in json_data:
             if key != 'success':
-                statuses.append(DeviceStatus.from_json(json_data[key]))
+                statuses.append(DeviceStatus.from_json({key : json_data[key]}))
 
         return cls(statuses)

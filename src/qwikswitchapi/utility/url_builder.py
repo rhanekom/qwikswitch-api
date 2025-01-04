@@ -1,9 +1,11 @@
 from urllib.parse import urljoin, quote_plus
 
+from src.qwikswitchapi.constants import Constants
+
 class UrlBuilder:
 
     @staticmethod
-    def build_get_all_device_status_url(base_uri: str, key: str) -> str:
+    def build_get_all_device_status_url(key: str, base_uri: str = Constants.DEFAULT_BASE_URI) -> str:
         """
         Builds the URL to get the status of all devices
         :param base_uri: The base URI to use
@@ -13,7 +15,7 @@ class UrlBuilder:
         return urljoin(base_uri, f'state/{quote_plus(key)}/')
 
     @staticmethod
-    def build_generate_api_keys_url(base_uri: str) -> str:
+    def build_generate_api_keys_url(base_uri:str = Constants.DEFAULT_BASE_URI) -> str:
         """
         Builds the URL to generate API keys
         :param base_uri: The base URI to use
@@ -22,7 +24,7 @@ class UrlBuilder:
         return urljoin(base_uri, 'keys')
 
     @staticmethod
-    def build_control_url(base_uri: str, key: str, device_id: str, level: int) -> str:
+    def build_control_url(key: str, device_id: str, level: int, base_uri: str = Constants.DEFAULT_BASE_URI) -> str:
         """
         Builds the URL to control a device
         :param base_uri: The base URI to use

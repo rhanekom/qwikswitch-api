@@ -79,10 +79,10 @@ class DeviceStatus:
         :raises QSException: on validation error
         """
 
-        if len(json_data > 1):
+        if len(json_data) > 1:
             raise QSException('Invalid JSON data for DeviceStatus')
 
-        device_id = json_data.keys()[0]
+        device_id = next(iter(json_data)) # Only expecting one key
         state_json_data = json_data[device_id]
 
         rssi = int(state_json_data['rssi'].replace('%', ''))

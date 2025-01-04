@@ -3,6 +3,7 @@ from urllib.parse import urljoin
 import requests
 from requests.exceptions import RequestException
 
+from src.qwikswitchapi.constants import Constants
 from src.qwikswitchapi.entities.api_keys import ApiKeys
 from src.qwikswitchapi.entities.control_result import ControlResult
 from src.qwikswitchapi.entities.device_statuses import DeviceStatuses
@@ -11,9 +12,8 @@ from src.qwikswitchapi.utility.url_builder import UrlBuilder
 
 
 class QSApi:
-    DEFAULT_BASE_URI = 'https://qwikswitch.com/api/v1/'
 
-    def __init__(self, email:str, master_key:str, base_uri:str=DEFAULT_BASE_URI):
+    def __init__(self, email:str, master_key:str, base_uri:str=Constants.DEFAULT_BASE_URI):
         """
         Initializes a new instance of the QSApi class
 
@@ -71,7 +71,7 @@ class QSApi:
         :raises QSException: when the request fails
         """
 
-        url = UrlBuilder.build_control_url(self._base_uri, auth.read_write_key, device_id, level)
+        url = UrlBuilder.build_control_url(auth.read_write_key, device_id, level, self._base_uri)
 
         try:
             resp = requests.get(url)
@@ -88,7 +88,7 @@ class QSApi:
         :raises QSException: when the request fails
         """
 
-        url = UrlBuilder.build_get_all_device_status_url(self._base_uri, auth.read_write_key)
+        url = UrlBuilder.build_get_all_device_status_url(auth.read_write_key, self._base_uri)
 
         try:
             resp = requests.get(url)
