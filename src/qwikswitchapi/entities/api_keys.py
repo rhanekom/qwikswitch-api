@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from src.qwikswitchapi.constants import Constants
 from src.qwikswitchapi.utility.response_parser import ResponseParser
 
 
@@ -43,7 +44,8 @@ class ApiKeys:
 
         json_data = resp.json()
 
-        if ('ok' in json_data and json_data['ok'] == 0) or ('err' in json_data):
+        if ((Constants.JsonKeys.OK in json_data and json_data[Constants.JsonKeys.OK] == 0) or
+                (Constants.JsonKeys.ERR in json_data)):
             ResponseParser.raise_request_error(resp)
 
-        return cls(json_data['r'], json_data['rw'])
+        return cls(json_data[Constants.JsonKeys.READ_KEY], json_data[Constants.JsonKeys.READ_WRITE_KEY])

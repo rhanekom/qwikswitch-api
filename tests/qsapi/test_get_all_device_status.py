@@ -1,5 +1,6 @@
 import pytest
 
+from src.qwikswitchapi.constants import Constants
 from src.qwikswitchapi.qs_exception import QSException
 from src.qwikswitchapi.utility.url_builder import UrlBuilder
 
@@ -16,7 +17,7 @@ def test_with_valid_credentials_returns_device_statuses(api, mock_request, mock_
             "value": 0
         },
         "@11111b": {
-            "type": "RELAY QS-D-S5",
+            "type": "RELAY QS-Q-S9",
             "hardware": "0x81",
             "firmware": "v3.3",
             "epoch": "1736018046",
@@ -34,8 +35,13 @@ def test_with_valid_credentials_returns_device_statuses(api, mock_request, mock_
     assert len(devices.statuses) == 2
     assert devices.statuses[0].device_id == "@11111a"
     assert devices.statuses[1].device_id == "@11111b"
+
     assert devices.statuses[0].rssi == 59
     assert devices.statuses[1].rssi == 58
+
+    assert devices.statuses[0].device_class == Constants.DeviceClass.dimmer
+    assert devices.statuses[1].device_class == Constants.DeviceClass.unknown
+
 
 def test_with_unknown_error_throws_exception(api, mock_request, mock_api_keys):
     mock_request.get(UrlBuilder.build_get_all_device_status_url(mock_api_keys.read_write_key), status_code=401)

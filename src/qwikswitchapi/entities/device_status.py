@@ -1,11 +1,21 @@
 from __future__ import annotations
 
+from codecs import replace_errors
+from typing import Any
+
+from src.qwikswitchapi.constants import Constants
 from src.qwikswitchapi.qs_exception import QSException
 from src.qwikswitchapi.utility.response_parser import ResponseParser
 
 
 class DeviceStatus:
-    def __init__(self, device_id:str, device_type:str, firmware:str, epoch:int, rssi:int, value:int):
+    def __init__(self,
+                 device_id:str,
+                 device_type:str,
+                 firmware:str,
+                 epoch:int,
+                 rssi:int,
+                 value:int):
         """
         Initializes a DeviceStatus object
         :param device_id: the unique device identifier
@@ -70,6 +80,17 @@ class DeviceStatus:
         """
         return self._value
 
+    @property
+    def device_class (self) -> Constants.DeviceClass | Any:
+        """
+        The class of the device
+        :return: The class of the device
+        """
+        if self._device_type in Constants.DEVICES:
+            return Constants.DEVICES[self._device_type]
+        else:
+            return Constants.DeviceClass.unknown
+
     @classmethod
     def from_json(cls, json_data) -> DeviceStatus:
         """
@@ -85,12 +106,12 @@ class DeviceStatus:
         device_id = next(iter(json_data)) # Only expecting one key
         state_json_data = json_data[device_id]
 
-        rssi = int(state_json_data['rssi'].replace('%', ''))
+        rssi = int(state_json_data[Constants.JsonKeys.RSSI].replace('%', ''))
         return cls(
             device_id,
-            state_json_data['type'],
-            state_json_data['firmware'],
-            state_json_data['epoch'],
+            state_json_data[Constants.JsonKeys.TYPE],
+            state_json_data[Constants.JsonKeys.FIRMWARE],
+            state_json_data[Constants.JsonKeys.EPOCH],
             rssi,
-            state_json_data['value']
+            state_json_data[Constants.JsonKeys.VALUE]
         )
