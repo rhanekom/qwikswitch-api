@@ -2,13 +2,18 @@ import pytest
 import requests_mock
 
 from src.qwikswitchapi.entities.api_keys import ApiKeys
+from src.qwikswitchapi.qs_api import QSApi
 
 
 @pytest.fixture
-def mock_api():
+def mock_request():
     with requests_mock.Mocker() as m:
         yield m
 
 @pytest.fixture()
 def mock_api_keys():
     return ApiKeys('read_key', 'read_write_key')
+
+@pytest.fixture()
+def api():
+    return QSApi('email', 'master_key')
