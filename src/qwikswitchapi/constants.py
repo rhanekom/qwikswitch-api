@@ -22,7 +22,7 @@ class Constants:
     class DeviceClass(Enum):
         relay = 1
         dimmer = 2
-        humidity_temperature = 3 
+        humidity_temperature = 3
         unknown = 999
 
     DEVICES = {

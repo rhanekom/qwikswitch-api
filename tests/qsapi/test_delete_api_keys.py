@@ -1,4 +1,5 @@
 import pytest
+import requests
 
 from src.qwikswitchapi.qs_exception import QSException
 from src.qwikswitchapi.utility.url_builder import UrlBuilder
@@ -14,13 +15,19 @@ def test_with_valid_credentials_returns_none(api, mock_request):
     mock_request.post(UrlBuilder.build_delete_api_keys_url(), json=response)
     api.delete_api_keys()
 
-def test_with_error_throws_exception(api, mock_request):
+def test_with_logical_error_throws_exception(api, mock_request):
     response = {
         "ok": 0,
         "err": "Please provide a valid serial key and email address of the registered owner."
     }
 
     mock_request.post(UrlBuilder.build_delete_api_keys_url(), json=response)
+
+    with pytest.raises(QSException):
+        api.delete_api_keys()
+
+def test_with_error_throws_exception(api, mock_request):
+    mock_request.post(UrlBuilder.build_delete_api_keys_url(), exc=requests.exceptions.Timeout)
 
     with pytest.raises(QSException):
         api.delete_api_keys()

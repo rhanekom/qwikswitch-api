@@ -1,4 +1,5 @@
 import pytest
+import requests
 
 from src.qwikswitchapi.qs_exception import QSException
 from src.qwikswitchapi.utility.url_builder import UrlBuilder
@@ -32,11 +33,20 @@ def test_success_returns_control_result(api, mock_request, mock_api_keys):
     }
 ])
 
-def test_error_raises_exception(response, api, mock_request, mock_api_keys):
+def test_logical_error_raises_exception(response, api, mock_request, mock_api_keys):
     device = "@112331"
     level = -1
     mock_request.get(UrlBuilder.build_control_url(mock_api_keys.read_write_key, device, level),
                      json=response)
+
+    with pytest.raises(QSException):
+        api.control_device(mock_api_keys, device, level)
+
+def test_error_raises_exception(api, mock_request, mock_api_keys):
+    device = "@112331"
+    level = -1
+    mock_request.get(UrlBuilder.build_control_url(mock_api_keys.read_write_key, device, level),
+                     exc=requests.exceptions.Timeout)
 
     with pytest.raises(QSException):
         api.control_device(mock_api_keys, device, level)
