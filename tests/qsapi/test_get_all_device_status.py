@@ -46,3 +46,19 @@ def test_with_unknown_error_throws_exception(mock_request, mock_api_keys):
 
     with pytest.raises(QSException):
         api.get_all_device_status(mock_api_keys)
+
+@pytest.mark.parametrize("response", [
+    {
+        "error": "INVALID_API_KEY"
+    },
+    {
+        "success": False
+    }
+])
+
+def test_error_raises_exception(response, api, mock_request, mock_api_keys):
+    mock_request.get(UrlBuilder.build_get_all_device_status_url(mock_api_keys.read_write_key),
+                     json=response)
+
+    with pytest.raises(QSException):
+        api.get_all_device_status(mock_api_keys)

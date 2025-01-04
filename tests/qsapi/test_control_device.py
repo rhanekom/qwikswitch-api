@@ -33,7 +33,7 @@ def test_success_returns_control_result(api, mock_request, mock_api_keys):
     }
 ])
 
-def test__error_raises_exception(response, api, mock_request, mock_api_keys):
+def test_error_raises_exception(response, api, mock_request, mock_api_keys):
     device = "@112331"
     level = -1
     mock_request.get(UrlBuilder.build_control_url(mock_api_keys.read_write_key, device, level),
