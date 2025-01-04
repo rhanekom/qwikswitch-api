@@ -22,5 +22,11 @@ dependencies = [
 
 [project.optional-dependencies]
 tests = ["pytest", "pytest-cov", "requests-mock", "pytest-flakes"]
+docs = ["sphinx", "pydata_sphinx_theme"]
+dev = [
+    "packageName[tests, docs]",
+    "build",
+    "twine"
+]
 
 [tool]

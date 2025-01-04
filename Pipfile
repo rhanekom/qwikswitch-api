@@ -10,6 +10,7 @@ pytest = "*"
 requests-mock = "*"
 pytest-cov = "*"
 pytest-flakes = "*"
+build = "*"
 
 [dev-packages]
 
