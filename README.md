@@ -29,7 +29,6 @@ api.control_device(api_keys, '@123450', 100)
 To list all current device statuses:
 
 ```python
-```python
 devices = api.get_all_device_status(api_keys)
 ```
 
