@@ -24,6 +24,15 @@ class UrlBuilder:
         return urljoin(base_uri, 'keys')
 
     @staticmethod
+    def build_delete_api_keys_url(base_uri: str = Constants.DEFAULT_BASE_URI) -> str:
+        """
+        Builds the URL to delete API keys
+        :param base_uri: The base URI to use
+        :return: The url to the 'Delete API keys' endpoint
+        """
+        return urljoin(base_uri, 'keys/delete/')
+
+    @staticmethod
     def build_control_url(key: str, device_id: str, level: int, base_uri: str = Constants.DEFAULT_BASE_URI) -> str:
         """
         Builds the URL to control a device

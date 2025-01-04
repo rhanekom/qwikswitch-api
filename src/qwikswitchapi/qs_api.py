@@ -60,6 +60,26 @@ class QSApi:
         except RequestException as ex:
             ResponseParser.raise_request_failure(url, ex)
 
+    def delete_api_keys(self) -> None:
+        """
+        Deletes API keys generated for the given email and master key
+
+        :returns: None
+        :raises QSException: on failure to delete API keys
+        """
+
+        url = UrlBuilder.build_delete_api_keys_url(self._base_uri)
+        req = {
+            'email': self._email,
+            'master_key': self._master_key
+        }
+
+        try:
+            resp = requests.post(url, json=req)
+            parsed_response = ApiKeys.from_resp(resp)
+        except RequestException as ex:
+            ResponseParser.raise_request_failure(url, ex)
+
     def control_device(self, auth:ApiKeys, device_id:str, level:int) -> ControlResult:
         """
         Controls a device by setting the desired level.

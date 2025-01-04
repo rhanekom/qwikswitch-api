@@ -1,6 +1,5 @@
 import pytest
 
-from src.qwikswitchapi.qs_api import QSApi
 from src.qwikswitchapi.qs_exception import QSException
 from src.qwikswitchapi.utility.url_builder import UrlBuilder
 
