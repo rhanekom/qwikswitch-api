@@ -45,3 +45,12 @@ def test__error_raises_exception(response, mock_api, mock_api_keys):
     with pytest.raises(QSException):
         api.control_device(mock_api_keys, device, level)
 
+def test_with_unknown_error_throws_exception(mock_api, mock_api_keys):
+    device = "@112331"
+    level = -1
+    mock_api.get(UrlBuilder.build_control_url(mock_api_keys.read_write_key, device, level), status_code=401)
+
+    api = QSApi('email', 'master_key')
+
+    with pytest.raises(QSException):
+        api.control_device(mock_api_keys, device, level)

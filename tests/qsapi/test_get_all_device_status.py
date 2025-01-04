@@ -1,4 +1,7 @@
+import pytest
+
 from src.qwikswitchapi.qs_api import QSApi
+from src.qwikswitchapi.qs_exception import QSException
 from src.qwikswitchapi.utility.url_builder import UrlBuilder
 
 
@@ -36,4 +39,10 @@ def test_with_valid_credentials_returns_device_statuses(mock_api, mock_api_keys)
     assert devices.statuses[0].rssi == 59
     assert devices.statuses[1].rssi == 58
 
+def test_with_unknown_error_throws_exception(mock_api, mock_api_keys):
+    mock_api.get(UrlBuilder.build_get_all_device_status_url(mock_api_keys.read_write_key), status_code=401)
 
+    api = QSApi('email', 'master_key')
+
+    with pytest.raises(QSException):
+        api.get_all_device_status(mock_api_keys)
