@@ -13,7 +13,15 @@ class QSApi:
     def __init__(self, email:str, master_key:str, base_uri:str=DEFAULT_BASE_URI):
         self._email = email
         self._master_key = master_key
+
+        if not base_uri.endswith('/'):
+            base_uri += '/'
+
         self._base_uri = base_uri
+
+    @property
+    def base_uri(self) -> str:
+        return self._base_uri
 
     def generate_api_keys(self) -> ApiKeys:
         url = urljoin(self._base_uri, 'keys')
@@ -69,6 +77,11 @@ class QSApi:
     @staticmethod
     def _raise_request_error(resp):
         raise QSException(QSApi._get_failure_message(resp))
+
+
+    @staticmethod
+    def _build_generate_api_keys_url(base_uri:str) -> str:
+        return urljoin(base_uri, 'keys')
 
     @staticmethod
     def _build_control_url(base_uri:str, key:str, device:str, level:int) -> str:
