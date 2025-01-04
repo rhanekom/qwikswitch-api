@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+from src.qwikswitchapi.utility.response_parser import ResponseParser
+
+
 class ControlResult:
     def __init__(self, device_id:str, level:int):
         """
@@ -27,10 +30,19 @@ class ControlResult:
         return self._level
 
     @classmethod
-    def from_json(cls, json_data) -> ControlResult:
+    def from_resp(cls, resp) -> ControlResult:
         """
         Constructs a ControlResult object from JSON data
-        :param json_data: The JSON data to construct the object from
+        :param resp: The response object to construct the object from
         :return: A ControlResult object
+        :raises QSException: on failure of the response, or validation error
         """
+        if resp.status_code != 200:
+            ResponseParser.raise_request_error(resp)
+
+        json_data = resp.json()
+
+        if ('success' in json_data and json_data['success'] == False) or ('error' in json_data):
+            ResponseParser.raise_request_error(resp)
+
         return cls(json_data['device'], json_data['level'])

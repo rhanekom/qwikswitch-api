@@ -5,6 +5,7 @@ from requests.exceptions import RequestException
 
 from src.qwikswitchapi.entities.api_keys import ApiKeys
 from src.qwikswitchapi.entities.control_result import ControlResult
+from src.qwikswitchapi.entities.device_statuses import DeviceStatuses
 from src.qwikswitchapi.utility.response_parser import ResponseParser
 from src.qwikswitchapi.utility.url_builder import UrlBuilder
 
@@ -55,12 +56,11 @@ class QSApi:
 
         try:
             resp = requests.post(url, json=req)
-            json_resp = QSApi._parse_response(resp)
-            return ApiKeys.from_json(json_resp)
+            return ApiKeys.from_resp(resp)
         except RequestException as ex:
             ResponseParser.raise_request_failure(url, ex)
 
-    def control_device(self, auth:ApiKeys, device_id:str, level:int):
+    def control_device(self, auth:ApiKeys, device_id:str, level:int) -> ControlResult:
         """
         Controls a device by setting the desired level.
 
@@ -75,12 +75,11 @@ class QSApi:
 
         try:
             resp = requests.get(url)
-            json_resp = QSApi._parse_response(resp)
-            return ControlResult.from_json(json_resp)
+            return ControlResult.from_resp(resp)
         except RequestException as ex:
             ResponseParser.raise_request_failure(url, ex)
 
-    def get_all_device_status(self, auth:ApiKeys):
+    def get_all_device_status(self, auth:ApiKeys) -> DeviceStatuses:
         """
         Retrieves the status of all devices registered to the given API keys
 
@@ -93,28 +92,9 @@ class QSApi:
 
         try:
             resp = requests.get(url)
-            json_resp = QSApi._parse_response(resp)
-            return ControlResult.from_json(json_resp)
+            return DeviceStatuses.from_resp(resp)
         except RequestException as ex:
             ResponseParser.raise_request_failure(url, ex)
-
-    @staticmethod
-    def _parse_response(resp) -> dict:
-        if resp.status_code != 200:
-            ResponseParser.raise_request_error(resp)
-
-        json_resp = resp.json()
-
-        if 'err' in json_resp:
-            ResponseParser.raise_request_error(resp)
-        if 'ok' in json_resp and json_resp['ok'] == 0:
-            ResponseParser.raise_request_error(resp)
-        if 'success' in json_resp and json_resp['success'] == False:
-            ResponseParser.raise_request_error(resp)
-        if 'error' in json_resp and "No Data" not in json_resp['error']:
-            ResponseParser.raise_request_error(resp)
-
-        return json_resp
 
 
 

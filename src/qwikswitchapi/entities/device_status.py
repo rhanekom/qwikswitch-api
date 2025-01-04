@@ -1,20 +1,34 @@
 from __future__ import annotations
 
+from src.qwikswitchapi.qs_exception import QSException
+from src.qwikswitchapi.utility.response_parser import ResponseParser
+
+
 class DeviceStatus:
-    def __init__(self, device_type:str, firmware:str, epoch:int, rssi:int, value:int):
+    def __init__(self, device_id:str, device_type:str, firmware:str, epoch:int, rssi:int, value:int):
         """
         Initializes a DeviceStatus object
+        :param device_id: the unique device identifier
         :param device_type: the type of device
         :param firmware: the version of the device firmware
         :param epoch: the epoch time of the last status update
         :param rssi: the signal strength of the device
         :param value: the current value of the device
         """
+        self._device_id = device_id
         self._device_type = device_type
         self._firmware = firmware
         self._epoch = epoch
         self._rssi = rssi
         self._value = value
+
+    @property
+    def device_id(self) -> str:
+        """
+        The unique identifier of the device
+        :return: the unique identifier of the device
+        """
+        return self._device_id
 
     @property
     def device_type(self) -> str:
@@ -61,13 +75,22 @@ class DeviceStatus:
         """
         Constructs a DeviceStatus object from JSON data
         :param json_data: The JSON data to construct the object from
-        :return: A ControlResult object
+        :return: A DeviceStatus object
+        :raises QSException: on validation error
         """
-        rssi = int(json_data['rssi'].replace('%', ''))
+
+        if len(json_data > 1):
+            raise QSException('Invalid JSON data for DeviceStatus')
+
+        device_id = json_data.keys()[0]
+        state_json_data = json_data[device_id]
+
+        rssi = int(state_json_data['rssi'].replace('%', ''))
         return cls(
-            json_data['type'],
-            json_data['firmware'],
-            json_data['epoch'],
+            device_id,
+            state_json_data['type'],
+            state_json_data['firmware'],
+            state_json_data['epoch'],
             rssi,
-            json_data['value']
+            state_json_data['value']
         )

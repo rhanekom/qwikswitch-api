@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+from src.qwikswitchapi.utility.response_parser import ResponseParser
+
+
 class ApiKeys:
     def __init__(self, read_key:str, read_write_key:str):
         """
@@ -28,9 +31,19 @@ class ApiKeys:
         return self._read_write_key
 
     @classmethod
-    def from_json(cls, json_data) -> ApiKeys:
+    def from_resp(cls, resp) -> ApiKeys:
         """
         Constructs an ApiKeys object from JSON data
+        :param resp: The response object to construct the object from
         :return: the ApiKeys object
+        :raises QSException: on failure of the response, or validation error
         """
+        if resp.status_code != 200:
+            ResponseParser.raise_request_error(resp)
+
+        json_data = resp.json()
+
+        if ('ok' in json_data and json_data['ok'] == 0) or ('err' in json_data):
+            ResponseParser.raise_request_error(resp)
+
         return cls(json_data['r'], json_data['rw'])
