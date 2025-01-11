@@ -1,25 +1,25 @@
 from enum import Enum
-
+from typing import Final
 
 class Constants:
-    DEFAULT_BASE_URI = 'https://qwikswitch.com/api/v1/'
+    DEFAULT_BASE_URI: Final = 'https://qwikswitch.com/api/v1/'
 
     class JsonKeys:
-        OK = 'ok'
-        SUCCESS = 'success'
-        ERROR = 'error'
-        ERR = 'err'
-        READ_KEY = 'r'
-        READ_WRITE_KEY = 'rw'
-        DEVICE = 'device'
-        LEVEL = 'level'
-        RSSI = 'rssi'
-        TYPE = 'type'
-        FIRMWARE = 'firmware'
-        EPOCH = 'epoch'
-        VALUE = 'value'
-        EMAIL = 'email'
-        MASTER_KEY = 'masterKey'
+        OK : Final = 'ok'
+        SUCCESS : Final = 'success'
+        ERROR : Final = 'error'
+        ERR : Final = 'err'
+        READ_KEY : Final = 'r'
+        READ_WRITE_KEY : Final = 'rw'
+        DEVICE : Final = 'device'
+        LEVEL : Final = 'level'
+        RSSI : Final = 'rssi'
+        TYPE : Final = 'type'
+        FIRMWARE : Final = 'firmware'
+        EPOCH : Final = 'epoch'
+        VALUE : Final = 'value'
+        EMAIL : Final = 'email'
+        MASTER_KEY : Final = 'masterKey'
 
     class DeviceClass(Enum):
         relay = 1
