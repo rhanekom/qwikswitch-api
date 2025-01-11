@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-from src.qwikswitchapi.constants import Constants
-from src.qwikswitchapi.utility.responseparser import ResponseParser
-
+from qwikswitchapi.constants import Constants
+from qwikswitchapi.utility.responseparser import ResponseParser
 
 class ApiKeys:
     def __init__(self, read_key:str, read_write_key:str):

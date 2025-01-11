@@ -1,8 +1,8 @@
 import pytest
 import requests
 
-from src.qwikswitchapi.qsexception import QSException
-from src.qwikswitchapi.utility.urlbuilder import UrlBuilder
+from qwikswitchapi.qsexception import QSException
+from qwikswitchapi.utility.urlbuilder import UrlBuilder
 
 
 def test_with_valid_credentials_returns_none(api, mock_request):

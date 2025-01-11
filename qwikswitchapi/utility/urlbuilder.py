@@ -1,6 +1,6 @@
 from urllib.parse import urljoin, quote_plus
 
-from src.qwikswitchapi.constants import Constants
+from qwikswitchapi.constants import Constants
 
 class UrlBuilder:
 

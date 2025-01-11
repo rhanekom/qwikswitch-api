@@ -1,11 +1,9 @@
 from __future__ import annotations
 
-from codecs import replace_errors
 from typing import Any
 
-from src.qwikswitchapi.constants import Constants
-from src.qwikswitchapi.qsexception import QSException
-from src.qwikswitchapi.utility.responseparser import ResponseParser
+from qwikswitchapi.constants import Constants
+from qwikswitchapi.qsexception import QSException
 
 
 class DeviceStatus:
