@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "qwikswitch_api"
-version = "0.0.5"
+version = "0.0.6"
 authors = [
   { name="Riaan Hanekom", email="riaan@hanekom.io" },
 ]
@@ -32,4 +32,4 @@ dev = [
 [tool]
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/qwikswitchapi"]
+packages = ["qwikswitchapi"]
