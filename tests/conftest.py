@@ -16,4 +16,4 @@ def mock_api_keys():
 
 @pytest.fixture()
 def api():
-    return QSApi('email', 'master_key')
+    return QSApi()

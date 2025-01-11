@@ -29,8 +29,8 @@ Sample usage to control a device:
 ```python
 from qwikswitch.qsapi import QSApi
 
-api = Qwikswitch('email', 'masterkey')
-api_keys = api.generate_api_keys()
+api = QSApi()
+api_keys = api.generate_api_keys('email', 'masterkey')
 api.control_device(api_keys, '@123450', 100)
 ```
 
