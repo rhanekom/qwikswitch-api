@@ -27,7 +27,7 @@ pip install qwikswitch-api
 Sample usage to control a device:
 
 ```python
-from qwikswitch import QSApi
+from qwikswitch.qsapi import QSApi
 
 api = Qwikswitch('email', 'masterkey')
 api_keys = api.generate_api_keys()

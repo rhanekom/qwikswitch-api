@@ -1,8 +1,8 @@
 import pytest
 import requests_mock
 
-from src.qwikswitchapi.entities.api_keys import ApiKeys
-from src.qwikswitchapi.qs_api import QSApi
+from src.qwikswitchapi.entities.apikeys import ApiKeys
+from src.qwikswitchapi.qsapi import QSApi
 
 
 @pytest.fixture

@@ -1,4 +1,4 @@
-from src.qwikswitchapi.qs_api import QSApi
+from src.qwikswitchapi.qsapi import QSApi
 
 
 def test_base_uri_without_trailing_slash_gets_added():

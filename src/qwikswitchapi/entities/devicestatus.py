@@ -4,8 +4,8 @@ from codecs import replace_errors
 from typing import Any
 
 from src.qwikswitchapi.constants import Constants
-from src.qwikswitchapi.qs_exception import QSException
-from src.qwikswitchapi.utility.response_parser import ResponseParser
+from src.qwikswitchapi.qsexception import QSException
+from src.qwikswitchapi.utility.responseparser import ResponseParser
 
 
 class DeviceStatus:

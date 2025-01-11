@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from src.qwikswitchapi.constants import Constants
-from src.qwikswitchapi.utility.response_parser import ResponseParser
+from src.qwikswitchapi.utility.responseparser import ResponseParser
 
 
 class ApiKeys:

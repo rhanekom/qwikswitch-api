@@ -3,8 +3,8 @@ from __future__ import annotations
 from typing import List
 
 from src.qwikswitchapi.constants import Constants
-from src.qwikswitchapi.entities.device_status import DeviceStatus
-from src.qwikswitchapi.utility.response_parser import ResponseParser
+from src.qwikswitchapi.entities.devicestatus import DeviceStatus
+from src.qwikswitchapi.utility.responseparser import ResponseParser
 
 
 class DeviceStatuses:

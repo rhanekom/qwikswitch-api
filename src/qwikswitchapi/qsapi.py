@@ -4,11 +4,11 @@ import requests
 from requests.exceptions import RequestException
 
 from src.qwikswitchapi.constants import Constants
-from src.qwikswitchapi.entities.api_keys import ApiKeys
-from src.qwikswitchapi.entities.control_result import ControlResult
-from src.qwikswitchapi.entities.device_statuses import DeviceStatuses
-from src.qwikswitchapi.utility.response_parser import ResponseParser
-from src.qwikswitchapi.utility.url_builder import UrlBuilder
+from src.qwikswitchapi.entities.apikeys import ApiKeys
+from src.qwikswitchapi.entities.controlresult import ControlResult
+from src.qwikswitchapi.entities.devicestatuses import DeviceStatuses
+from src.qwikswitchapi.utility.responseparser import ResponseParser
+from src.qwikswitchapi.utility.urlbuilder import UrlBuilder
 
 
 class QSApi:
