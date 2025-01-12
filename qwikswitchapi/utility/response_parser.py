@@ -1,6 +1,6 @@
 from requests import RequestException
 
-from qwikswitchapi.qsexception import QSException
+from qwikswitchapi.qs_exception import QSException
 
 class ResponseParser:
 

@@ -2,14 +2,14 @@ import requests
 from requests.exceptions import RequestException
 
 from qwikswitchapi.constants import Constants
-from qwikswitchapi.entities.apikeys import ApiKeys
-from qwikswitchapi.entities.controlresult import ControlResult
-from qwikswitchapi.entities.devicestatuses import DeviceStatuses
-from qwikswitchapi.utility.responseparser import ResponseParser
-from qwikswitchapi.utility.urlbuilder import UrlBuilder
+from qwikswitchapi.entities.api_keys import ApiKeys
+from qwikswitchapi.entities.control_result import ControlResult
+from qwikswitchapi.entities.device_statuses import DeviceStatuses
+from qwikswitchapi.utility.response_parser import ResponseParser
+from qwikswitchapi.utility.url_builder import UrlBuilder
 
 
-class QSApi:
+class QSClient:
 
     def __init__(self, base_uri:str=Constants.DEFAULT_BASE_URI):
         """

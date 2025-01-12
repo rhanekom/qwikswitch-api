@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Any
 
 from qwikswitchapi.constants import Constants
-from qwikswitchapi.qsexception import QSException
+from qwikswitchapi.qs_exception import QSException
 
 
 class DeviceStatus:
