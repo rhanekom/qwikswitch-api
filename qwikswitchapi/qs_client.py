@@ -8,15 +8,19 @@ from qwikswitchapi.entities.device_statuses import DeviceStatuses
 from qwikswitchapi.utility.response_parser import ResponseParser
 from qwikswitchapi.utility.url_builder import UrlBuilder
 
-
 class QSClient:
 
-    def __init__(self, base_uri:str=Constants.DEFAULT_BASE_URI):
+    def __init__(self, email:str, master_key:str, base_uri:str=Constants.DEFAULT_BASE_URI):
         """
         Initializes a new instance of the QSApi class
 
+        :param email: the email address to generate API keys for:param email: your email address registered on https://qwikswitch.com
+        :param master_key: 12 character key found under your CloudHub.  This should be your device id of your Qwikswitch Wi-Fi bridge.
         :param base_uri: the base URI of the Qwikswitch API, optional.  Defaults to 'https://qwikswitch.com/api/v1/'
         """
+
+        self._email = email
+        self._master_key = master_key
 
         if not base_uri.endswith('/'):
             base_uri += '/'
@@ -33,20 +37,18 @@ class QSClient:
 
         return self._base_uri
 
-    def generate_api_keys(self, email:str, master_key:str,) -> ApiKeys:
+    def generate_api_keys(self, ) -> ApiKeys:
         """
         Generates API keys for the given email and master key to be used in subsequent calls
 
-        :param email: the email address to generate API keys for:param email: your email address registered on https://qwikswitch.com
-        :param master_key: 12 character key found under your CloudHub.  This should be your device id of your Qwikswitch Wi-Fi bridge.
         :returns: APIKeys, with an API key for read operations, and one for read-write operations.
         :raises QSException: on failure to generate API keys
         """
 
         url = UrlBuilder.build_generate_api_keys_url(self._base_uri)
         req = {
-            Constants.JsonKeys.EMAIL: email,
-            Constants.JsonKeys.MASTER_KEY: master_key
+            Constants.JsonKeys.EMAIL: self._email,
+            Constants.JsonKeys.MASTER_KEY: self._master_key
         }
 
         try:
@@ -55,20 +57,18 @@ class QSClient:
         except RequestException as ex:
             ResponseParser.raise_request_failure(url, ex)
 
-    def delete_api_keys(self, email: str, master_key: str) -> None:
+    def delete_api_keys(self) -> None:
         """
         Deletes API keys generated for the given email and master key
 
-        :param email: the email address to generate API keys for:param email: your email address registered on https://qwikswitch.com
-        :param master_key: 12 character key found under your CloudHub.  This should be your device id of your Qwikswitch Wi-Fi bridge.
         :returns: None
         :raises QSException: on failure to delete API keys
         """
 
         url = UrlBuilder.build_delete_api_keys_url(self._base_uri)
         req = {
-            Constants.JsonKeys.EMAIL: email,
-            Constants.JsonKeys.MASTER_KEY: master_key
+            Constants.JsonKeys.EMAIL: self._email,
+            Constants.JsonKeys.MASTER_KEY: self._master_key
         }
 
         try:

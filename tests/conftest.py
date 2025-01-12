@@ -16,4 +16,4 @@ def mock_api_keys():
 
 @pytest.fixture()
 def api():
-    return QSClient()
+    return QSClient('email', 'master')
