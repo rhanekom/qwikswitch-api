@@ -39,12 +39,12 @@ class ApiKeys:
         :raises QSException: on failure of the response, or validation error
         """
         if resp.status_code != 200:
-            ResponseParser.raise_request_error(resp)
+            ResponseParser.raise_auth_failure(resp)
 
         json_data = resp.json()
 
         if ((Constants.JsonKeys.OK in json_data and json_data[Constants.JsonKeys.OK] == 0) or
                 (Constants.JsonKeys.ERR in json_data)):
-            ResponseParser.raise_request_error(resp)
+            ResponseParser.raise_auth_failure(resp)
 
         return cls(json_data[Constants.JsonKeys.READ_KEY], json_data[Constants.JsonKeys.READ_WRITE_KEY])

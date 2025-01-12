@@ -21,6 +21,7 @@ class QSClient:
 
         self._email = email
         self._master_key = master_key
+        self._api_keys = None
 
         if not base_uri.endswith('/'):
             base_uri += '/'
@@ -37,7 +38,7 @@ class QSClient:
 
         return self._base_uri
 
-    def generate_api_keys(self, ) -> ApiKeys:
+    def generate_api_keys(self) -> ApiKeys:
         """
         Generates API keys for the given email and master key to be used in subsequent calls
 
@@ -53,7 +54,8 @@ class QSClient:
 
         try:
             resp = requests.post(url, json=req)
-            return ApiKeys.from_resp(resp)
+            self._api_keys = ApiKeys.from_resp(resp)
+            return self._api_keys
         except RequestException as ex:
             ResponseParser.raise_request_failure(url, ex)
 

@@ -1,7 +1,7 @@
 import pytest
 import requests
 
-from qwikswitchapi.qs_exception import QSException
+from qwikswitchapi.qs_exception import QSException, QSRequestErrorException, QSRequestFailedException, QSAuthException
 from qwikswitchapi.utility.url_builder import UrlBuilder
 
 
@@ -23,13 +23,13 @@ def test_with_logical_error_throws_exception(api, mock_request):
 
     mock_request.post(UrlBuilder.build_delete_api_keys_url(), json=response)
 
-    with pytest.raises(QSException):
+    with pytest.raises(QSAuthException):
         api.delete_api_keys()
 
 def test_with_error_throws_exception(api, mock_request):
     mock_request.post(UrlBuilder.build_delete_api_keys_url(), exc=requests.exceptions.Timeout)
 
-    with pytest.raises(QSException):
+    with pytest.raises(QSRequestFailedException):
         api.delete_api_keys()
 
 def test_with_unknown_error_throws_exception(api, mock_request):

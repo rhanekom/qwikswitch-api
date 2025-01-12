@@ -1,6 +1,7 @@
 from requests import RequestException
 
-from qwikswitchapi.qs_exception import QSException
+from qwikswitchapi.qs_exception import QSAuthException, QSRequestFailedException, QSRequestErrorException
+
 
 class ResponseParser:
 
@@ -22,7 +23,7 @@ class ResponseParser:
         :param ex: The exception that was raised
         :raises QSException: Indicating the request failed, chained with the original exception.
         """
-        raise QSException(f'Request to {url} failed: {str(ex)}') from ex
+        raise QSRequestFailedException(f'Request to {url} failed: {str(ex)}') from ex
 
     @staticmethod
     def raise_request_error(resp):
@@ -31,4 +32,13 @@ class ResponseParser:
         :param resp: The response object
         :raises QSException: Indicating the request failed, with the body of the response.
         """
-        raise QSException(ResponseParser.get_failure_message(resp))
+        raise QSRequestErrorException(ResponseParser.get_failure_message(resp))
+
+    @staticmethod
+    def raise_auth_failure(resp):
+        """
+        Raises a QSAuthException indicating the request failed
+        :param resp: The response object
+        :raises QSException: Indicating the request failed, with the body of the response.
+        """
+        raise QSAuthException(ResponseParser.get_failure_message(resp))

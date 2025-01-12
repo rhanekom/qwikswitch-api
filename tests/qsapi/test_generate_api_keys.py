@@ -1,7 +1,7 @@
 import pytest
 import requests.exceptions
 
-from qwikswitchapi.qs_exception import QSException
+from qwikswitchapi.qs_exception import QSException, QSAuthException, QSRequestErrorException, QSRequestFailedException
 from qwikswitchapi.utility.url_builder import UrlBuilder
 
 
@@ -28,13 +28,13 @@ def test_with_logical_error_throws_exception(api, mock_request):
 
     mock_request.post(UrlBuilder.build_generate_api_keys_url(), json=response)
 
-    with pytest.raises(QSException):
+    with pytest.raises(QSAuthException):
         api.generate_api_keys()
 
 def test_with_error_throws_exception(api, mock_request):
     mock_request.post(UrlBuilder.build_generate_api_keys_url(), exc=requests.exceptions.Timeout)
 
-    with pytest.raises(QSException):
+    with pytest.raises(QSRequestFailedException):
         api.generate_api_keys()
 
 def test_with_unknown_error_throws_exception(api, mock_request):
@@ -44,7 +44,7 @@ def test_with_unknown_error_throws_exception(api, mock_request):
 
     mock_request.post(UrlBuilder.build_generate_api_keys_url(), json=response)
 
-    with pytest.raises(QSException):
+    with pytest.raises(QSAuthException):
         api.generate_api_keys()
 
 def test_with_invalid_credentials_unknown_error_throws_exception(api, mock_request):
