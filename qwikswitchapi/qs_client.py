@@ -1,5 +1,6 @@
 import requests
 from requests.exceptions import RequestException
+import functools
 
 from qwikswitchapi.constants import Constants
 from qwikswitchapi.entities.api_keys import ApiKeys
@@ -9,6 +10,26 @@ from qwikswitchapi.utility.response_parser import ResponseParser
 from qwikswitchapi.utility.url_builder import UrlBuilder
 
 class QSClient:
+
+    def _ensure_authenticated(func):
+        @functools.wraps(func)
+        def authenticate_if_needed(self, *args, **kwargs):
+            if self._api_keys is None:
+                self.generate_api_keys()
+            return func(self, *args, **kwargs)
+
+        return authenticate_if_needed
+
+    def _handle_request_failure(func):
+        @functools.wraps(func)
+        def catch_failure(self, *args, **kwargs):
+            try:
+                return func(self, *args, **kwargs)
+            except RequestException as ex:
+                url = ex.request.url if ex.request is not None else "Unknown"
+                ResponseParser.raise_request_failure(url, ex)
+
+        return catch_failure
 
     def __init__(self, email:str, master_key:str, base_uri:str=Constants.DEFAULT_BASE_URI):
         """
@@ -38,6 +59,7 @@ class QSClient:
 
         return self._base_uri
 
+    @_handle_request_failure
     def generate_api_keys(self) -> ApiKeys:
         """
         Generates API keys for the given email and master key to be used in subsequent calls
@@ -52,13 +74,11 @@ class QSClient:
             Constants.JsonKeys.MASTER_KEY: self._master_key
         }
 
-        try:
-            resp = requests.post(url, json=req)
-            self._api_keys = ApiKeys.from_resp(resp)
-            return self._api_keys
-        except RequestException as ex:
-            ResponseParser.raise_request_failure(url, ex)
+        resp = requests.post(url, json=req)
+        self._api_keys = ApiKeys.from_resp(resp)
+        return self._api_keys
 
+    @_handle_request_failure
     def delete_api_keys(self) -> None:
         """
         Deletes API keys generated for the given email and master key
@@ -73,12 +93,11 @@ class QSClient:
             Constants.JsonKeys.MASTER_KEY: self._master_key
         }
 
-        try:
-            resp = requests.post(url, json=req)
-            parsed_response = ApiKeys.from_resp(resp)
-        except RequestException as ex:
-            ResponseParser.raise_request_failure(url, ex)
+        resp = requests.post(url, json=req)
+        _ = ApiKeys.from_resp(resp)
 
+    @_ensure_authenticated
+    @_handle_request_failure
     def control_device(self, auth:ApiKeys, device_id:str, level:int) -> ControlResult:
         """
         Controls a device by setting the desired level.
@@ -92,12 +111,11 @@ class QSClient:
 
         url = UrlBuilder.build_control_url(auth.read_write_key, device_id, level, self._base_uri)
 
-        try:
-            resp = requests.get(url)
-            return ControlResult.from_resp(resp)
-        except RequestException as ex:
-            ResponseParser.raise_request_failure(url, ex)
+        resp = requests.get(url)
+        return ControlResult.from_resp(resp)
 
+    @_ensure_authenticated
+    @_handle_request_failure
     def get_all_device_status(self, auth:ApiKeys) -> DeviceStatuses:
         """
         Retrieves the status of all devices registered to the given API keys
@@ -109,11 +127,9 @@ class QSClient:
 
         url = UrlBuilder.build_get_all_device_status_url(auth.read_write_key, self._base_uri)
 
-        try:
-            resp = requests.get(url)
-            return DeviceStatuses.from_resp(resp)
-        except RequestException as ex:
-            ResponseParser.raise_request_failure(url, ex)
+        resp = requests.get(url)
+        return DeviceStatuses.from_resp(resp)
 
-
+    _ensure_authenticated = staticmethod(_ensure_authenticated)
+    _handle_request_failure = staticmethod(_handle_request_failure)
 

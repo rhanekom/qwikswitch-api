@@ -2,11 +2,11 @@ import pytest
 import requests.exceptions
 
 from qwikswitchapi.constants import Constants
-from qwikswitchapi.qs_exception import QSException, QSRequestErrorException, QSRequestFailedException
+from qwikswitchapi.qs_exception import QSRequestErrorException, QSRequestFailedException
 from qwikswitchapi.utility.url_builder import UrlBuilder
 
 
-def test_with_valid_credentials_returns_device_statuses(api, mock_request, mock_api_keys):
+def test_with_valid_credentials_returns_device_statuses(authenticated_api_client, mock_request, mock_api_keys):
     response = {
     "success": True,
         "@11111a": {
@@ -29,7 +29,7 @@ def test_with_valid_credentials_returns_device_statuses(api, mock_request, mock_
 
     mock_request.get(UrlBuilder.build_get_all_device_status_url(mock_api_keys.read_write_key), json=response)
 
-    devices = api.get_all_device_status(mock_api_keys)
+    devices = authenticated_api_client.get_all_device_status(mock_api_keys)
 
     assert devices is not None
     assert devices.statuses is not None
@@ -44,11 +44,11 @@ def test_with_valid_credentials_returns_device_statuses(api, mock_request, mock_
     assert devices.statuses[1].device_class == Constants.DeviceClass.unknown
 
 
-def test_with_unknown_error_throws_exception(api, mock_request, mock_api_keys):
+def test_with_unknown_error_throws_exception(authenticated_api_client, mock_request, mock_api_keys):
     mock_request.get(UrlBuilder.build_get_all_device_status_url(mock_api_keys.read_write_key), status_code=401)
 
     with pytest.raises(QSRequestErrorException):
-        api.get_all_device_status(mock_api_keys)
+        authenticated_api_client.get_all_device_status(mock_api_keys)
 
 @pytest.mark.parametrize("response", [
     {
@@ -59,16 +59,16 @@ def test_with_unknown_error_throws_exception(api, mock_request, mock_api_keys):
     }
 ])
 
-def test_logical_error_raises_exception(response, api, mock_request, mock_api_keys):
+def test_logical_error_raises_exception(response, authenticated_api_client, mock_request, mock_api_keys):
     mock_request.get(UrlBuilder.build_get_all_device_status_url(mock_api_keys.read_write_key),
                      json=response)
 
     with pytest.raises(QSRequestErrorException):
-        api.get_all_device_status(mock_api_keys)
+        authenticated_api_client.get_all_device_status(mock_api_keys)
 
-def test_error_raises_exception(api, mock_request, mock_api_keys):
+def test_error_raises_exception(authenticated_api_client, mock_request, mock_api_keys):
     mock_request.get(UrlBuilder.build_get_all_device_status_url(mock_api_keys.read_write_key),
                      exc=requests.exceptions.Timeout)
 
     with pytest.raises(QSRequestFailedException):
-        api.get_all_device_status(mock_api_keys)
+        authenticated_api_client.get_all_device_status(mock_api_keys)

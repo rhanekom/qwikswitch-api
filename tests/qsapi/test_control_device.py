@@ -1,11 +1,11 @@
 import pytest
 import requests
 
-from qwikswitchapi.qs_exception import QSException, QSRequestErrorException, QSRequestFailedException
+from qwikswitchapi.qs_exception import QSRequestErrorException, QSRequestFailedException
 from qwikswitchapi.utility.url_builder import UrlBuilder
 
 
-def test_success_returns_control_result(api, mock_request, mock_api_keys):
+def test_success_returns_control_result(authenticated_api_client, mock_request, mock_api_keys):
     device_id = "@112331"
     level = 50
     response = {
@@ -15,7 +15,7 @@ def test_success_returns_control_result(api, mock_request, mock_api_keys):
     }
 
     mock_request.get(UrlBuilder.build_control_url(mock_api_keys.read_write_key, device_id, level), json=response)
-    result = api.control_device(mock_api_keys, device_id, level)
+    result = authenticated_api_client.control_device(mock_api_keys, device_id, level)
 
     assert result is not None
     assert result.device_id == device_id
@@ -33,28 +33,28 @@ def test_success_returns_control_result(api, mock_request, mock_api_keys):
     }
 ])
 
-def test_logical_error_raises_exception(response, api, mock_request, mock_api_keys):
+def test_logical_error_raises_exception(response, authenticated_api_client, mock_request, mock_api_keys):
     device = "@112331"
     level = -1
     mock_request.get(UrlBuilder.build_control_url(mock_api_keys.read_write_key, device, level),
                      json=response)
 
     with pytest.raises(QSRequestErrorException):
-        api.control_device(mock_api_keys, device, level)
+        authenticated_api_client.control_device(mock_api_keys, device, level)
 
-def test_error_raises_exception(api, mock_request, mock_api_keys):
+def test_error_raises_exception(authenticated_api_client, mock_request, mock_api_keys):
     device = "@112331"
     level = -1
     mock_request.get(UrlBuilder.build_control_url(mock_api_keys.read_write_key, device, level),
                      exc=requests.exceptions.Timeout)
 
     with pytest.raises(QSRequestFailedException):
-        api.control_device(mock_api_keys, device, level)
+        authenticated_api_client.control_device(mock_api_keys, device, level)
 
-def test_with_unknown_error_throws_exception(api, mock_request, mock_api_keys):
+def test_with_unknown_error_throws_exception(authenticated_api_client, mock_request, mock_api_keys):
     device = "@112331"
     level = -1
     mock_request.get(UrlBuilder.build_control_url(mock_api_keys.read_write_key, device, level), status_code=401)
 
-    with pytest.raises(QSException):
-        api.control_device(mock_api_keys, device, level)
+    with pytest.raises(QSRequestErrorException):
+        authenticated_api_client.control_device(mock_api_keys, device, level)
