@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from qwikswitchapi.constants import Constants
+from qwikswitchapi.constants import JsonKeys
 from qwikswitchapi.utility.response_parser import ResponseParser
 
 class ApiKeys:
@@ -43,8 +43,8 @@ class ApiKeys:
 
         json_data = resp.json()
 
-        if ((Constants.JsonKeys.OK in json_data and json_data[Constants.JsonKeys.OK] == 0) or
-                (Constants.JsonKeys.ERR in json_data)):
+        if ((JsonKeys.OK in json_data and json_data[JsonKeys.OK] == 0) or
+                (JsonKeys.ERR in json_data)):
             ResponseParser.raise_auth_failure(resp)
 
-        return cls(json_data[Constants.JsonKeys.READ_KEY], json_data[Constants.JsonKeys.READ_WRITE_KEY])
+        return cls(json_data[JsonKeys.READ_KEY], json_data[JsonKeys.READ_WRITE_KEY])

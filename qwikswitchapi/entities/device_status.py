@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from qwikswitchapi.constants import Constants
+from qwikswitchapi.constants import DeviceClass, DEVICES, JsonKeys
 from qwikswitchapi.qs_exception import QSException
 
 
@@ -79,15 +79,15 @@ class DeviceStatus:
         return self._value
 
     @property
-    def device_class (self) -> Constants.DeviceClass | Any:
+    def device_class (self) -> DeviceClass | Any:
         """
         The class of the device
         :return: The class of the device
         """
-        if self._device_type in Constants.DEVICES:
-            return Constants.DEVICES[self._device_type]
+        if self._device_type in DEVICES:
+            return DEVICES[self._device_type]
         else:
-            return Constants.DeviceClass.unknown
+            return DeviceClass.unknown
 
     @classmethod
     def from_json(cls, json_data) -> DeviceStatus:
@@ -104,12 +104,12 @@ class DeviceStatus:
         device_id = next(iter(json_data)) # Only expecting one key
         state_json_data = json_data[device_id]
 
-        rssi = int(state_json_data[Constants.JsonKeys.RSSI].replace('%', ''))
+        rssi = int(state_json_data[JsonKeys.RSSI].replace('%', ''))
         return cls(
             device_id,
-            state_json_data[Constants.JsonKeys.TYPE],
-            state_json_data[Constants.JsonKeys.FIRMWARE],
-            state_json_data[Constants.JsonKeys.EPOCH],
+            state_json_data[JsonKeys.TYPE],
+            state_json_data[JsonKeys.FIRMWARE],
+            state_json_data[JsonKeys.EPOCH],
             rssi,
-            state_json_data[Constants.JsonKeys.VALUE]
+            state_json_data[JsonKeys.VALUE]
         )

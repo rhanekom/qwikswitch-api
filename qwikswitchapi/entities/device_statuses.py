@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import List
 
-from qwikswitchapi.constants import Constants
+from qwikswitchapi.constants import JsonKeys
 from qwikswitchapi.entities.device_status import DeviceStatus
 from qwikswitchapi.utility.response_parser import ResponseParser
 
@@ -30,14 +30,14 @@ class DeviceStatuses:
 
         json_data = resp.json()
 
-        if ((Constants.JsonKeys.SUCCESS in json_data and json_data[Constants.JsonKeys.SUCCESS] == False)
-                or (Constants.JsonKeys.ERROR in json_data)):
+        if ((JsonKeys.SUCCESS in json_data and json_data[JsonKeys.SUCCESS] == False)
+                or (JsonKeys.ERROR in json_data)):
             ResponseParser.raise_request_error(resp)
 
         statuses = []
 
         for key in json_data:
-            if key != Constants.JsonKeys.SUCCESS:
+            if key != JsonKeys.SUCCESS:
                 statuses.append(DeviceStatus.from_json({key : json_data[key]}))
 
         return cls(statuses)

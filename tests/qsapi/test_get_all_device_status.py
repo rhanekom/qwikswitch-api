@@ -1,7 +1,7 @@
 import pytest
 import requests.exceptions
 
-from qwikswitchapi.constants import Constants
+from qwikswitchapi.constants import DeviceClass
 from qwikswitchapi.qs_exception import QSRequestErrorException, QSRequestFailedException
 from qwikswitchapi.utility.url_builder import UrlBuilder
 
@@ -41,8 +41,8 @@ def test_with_valid_credentials_returns_device_statuses(authenticated_api_client
     assert devices.statuses[0].rssi == 59
     assert devices.statuses[1].rssi == 58
 
-    assert devices.statuses[0].device_class == Constants.DeviceClass.dimmer
-    assert devices.statuses[1].device_class == Constants.DeviceClass.unknown
+    assert devices.statuses[0].device_class == DeviceClass.dimmer
+    assert devices.statuses[1].device_class == DeviceClass.unknown
 
 
 def test_with_unknown_error_throws_exception(authenticated_api_client, mock_request):

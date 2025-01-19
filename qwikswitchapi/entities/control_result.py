@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from qwikswitchapi.constants import Constants
+from qwikswitchapi.constants import JsonKeys
 from qwikswitchapi.utility.response_parser import ResponseParser
 
 
@@ -43,8 +43,8 @@ class ControlResult:
 
         json_data = resp.json()
 
-        if ((Constants.JsonKeys.SUCCESS in json_data and json_data[Constants.JsonKeys.SUCCESS] == False)
-                or (Constants.JsonKeys.ERROR in json_data)):
+        if ((JsonKeys.SUCCESS in json_data and json_data[JsonKeys.SUCCESS] == False)
+                or (JsonKeys.ERROR in json_data)):
             ResponseParser.raise_request_error(resp)
 
-        return cls(json_data[Constants.JsonKeys.DEVICE], json_data[Constants.JsonKeys.LEVEL])
+        return cls(json_data[JsonKeys.DEVICE], json_data[JsonKeys.LEVEL])

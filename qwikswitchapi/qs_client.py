@@ -2,7 +2,7 @@ import requests
 from requests.exceptions import RequestException
 import functools
 
-from qwikswitchapi.constants import Constants
+from qwikswitchapi.constants import JsonKeys, DEFAULT_BASE_URI
 from qwikswitchapi.entities.api_keys import ApiKeys
 from qwikswitchapi.entities.control_result import ControlResult
 from qwikswitchapi.entities.device_statuses import DeviceStatuses
@@ -31,7 +31,7 @@ class QSClient:
 
         return catch_failure
 
-    def __init__(self, email:str, master_key:str, base_uri:str=Constants.DEFAULT_BASE_URI):
+    def __init__(self, email:str, master_key:str, base_uri:str=DEFAULT_BASE_URI):
         """
         Initializes a new instance of the QSApi class
 
@@ -70,8 +70,8 @@ class QSClient:
 
         url = UrlBuilder.build_generate_api_keys_url(self._base_uri)
         req = {
-            Constants.JsonKeys.EMAIL: self._email,
-            Constants.JsonKeys.MASTER_KEY: self._master_key
+            JsonKeys.EMAIL: self._email,
+            JsonKeys.MASTER_KEY: self._master_key
         }
 
         resp = requests.post(url, json=req)
@@ -89,8 +89,8 @@ class QSClient:
 
         url = UrlBuilder.build_delete_api_keys_url(self._base_uri)
         req = {
-            Constants.JsonKeys.EMAIL: self._email,
-            Constants.JsonKeys.MASTER_KEY: self._master_key
+            JsonKeys.EMAIL: self._email,
+            JsonKeys.MASTER_KEY: self._master_key
         }
 
         resp = requests.post(url, json=req)
