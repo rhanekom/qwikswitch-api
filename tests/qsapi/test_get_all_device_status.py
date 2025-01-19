@@ -31,6 +31,7 @@ def test_with_valid_credentials_returns_device_statuses(authenticated_api_client
 
     devices = authenticated_api_client.get_all_device_status()
 
+    assert mock_request.called
     assert devices is not None
     assert devices.statuses is not None
     assert len(devices.statuses) == 2

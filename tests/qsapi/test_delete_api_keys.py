@@ -14,6 +14,7 @@ def test_with_valid_credentials_returns_none(api_client, mock_request):
 
     mock_request.post(UrlBuilder.build_delete_api_keys_url(), json=response)
     api_client.delete_api_keys()
+    assert mock_request.called
 
 def test_with_logical_error_throws_exception(api_client, mock_request):
     response = {
@@ -39,11 +40,11 @@ def test_with_unknown_error_throws_exception(api_client, mock_request):
 
     mock_request.post(UrlBuilder.build_delete_api_keys_url(), json=response)
 
-    with pytest.raises(QSException):
+    with pytest.raises(QSAuthException):
         api_client.delete_api_keys()
 
 def test_with_invalid_credentials_unknown_error_throws_exception(api_client, mock_request):
     mock_request.post(UrlBuilder.build_delete_api_keys_url(), status_code=401)
 
-    with pytest.raises(QSException):
+    with pytest.raises(QSAuthException):
         api_client.delete_api_keys()

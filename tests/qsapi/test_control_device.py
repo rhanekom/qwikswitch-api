@@ -17,6 +17,7 @@ def test_success_returns_control_result(authenticated_api_client, mock_request):
     mock_request.get(UrlBuilder.build_control_url(authenticated_api_client._api_keys.read_write_key, device_id, level), json=response)
     result = authenticated_api_client.control_device(device_id, level)
 
+    assert mock_request.called
     assert result is not None
     assert result.device_id == device_id
     assert result.level == level
