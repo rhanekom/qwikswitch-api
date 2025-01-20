@@ -2,8 +2,8 @@ import pytest
 import requests.exceptions
 
 from qwikswitchapi.constants import DeviceClass
-from qwikswitchapi.qs_exception import QSRequestErrorException, QSRequestFailedException
-from qwikswitchapi.utility.url_builder import UrlBuilder
+from qwikswitchapi.exceptions import QSRequestErrorException, QSRequestFailedException
+from qwikswitchapi.utility import UrlBuilder
 
 
 def test_with_valid_credentials_returns_device_statuses(authenticated_api_client, mock_request):

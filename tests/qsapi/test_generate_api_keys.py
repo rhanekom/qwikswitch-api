@@ -1,9 +1,9 @@
 import pytest
 import requests.exceptions
 
-from qwikswitchapi.qs_client import QSClient
-from qwikswitchapi.qs_exception import QSException, QSAuthException, QSRequestErrorException, QSRequestFailedException
-from qwikswitchapi.utility.url_builder import UrlBuilder
+from qwikswitchapi.client import QSClient
+from qwikswitchapi.exceptions import QSException, QSAuthException, QSRequestFailedException
+from qwikswitchapi.utility import UrlBuilder
 
 
 def test_with_valid_credentials_returns_keys(api_client, mock_request):

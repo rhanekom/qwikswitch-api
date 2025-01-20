@@ -3,11 +3,9 @@ from requests.exceptions import RequestException
 import functools
 
 from qwikswitchapi.constants import JsonKeys, DEFAULT_BASE_URI
-from qwikswitchapi.entities.api_keys import ApiKeys
-from qwikswitchapi.entities.control_result import ControlResult
-from qwikswitchapi.entities.device_statuses import DeviceStatuses
-from qwikswitchapi.utility.response_parser import ResponseParser
-from qwikswitchapi.utility.url_builder import UrlBuilder
+from qwikswitchapi.entities import ApiKeys, ControlResult, DeviceStatuses
+from qwikswitchapi.utility import ResponseParser
+from qwikswitchapi.utility import UrlBuilder
 
 class QSClient:
 

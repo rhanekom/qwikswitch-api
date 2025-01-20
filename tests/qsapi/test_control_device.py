@@ -1,8 +1,8 @@
 import pytest
 import requests
 
-from qwikswitchapi.qs_exception import QSRequestErrorException, QSRequestFailedException
-from qwikswitchapi.utility.url_builder import UrlBuilder
+from qwikswitchapi.exceptions import QSRequestErrorException, QSRequestFailedException
+from qwikswitchapi.utility import UrlBuilder
 
 
 def test_success_returns_control_result(authenticated_api_client, mock_request):

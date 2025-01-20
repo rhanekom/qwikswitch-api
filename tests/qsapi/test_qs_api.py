@@ -1,4 +1,4 @@
-from qwikswitchapi.qs_client import QSClient
+from qwikswitchapi.client import QSClient
 
 
 def test_base_uri_without_trailing_slash_gets_added():
