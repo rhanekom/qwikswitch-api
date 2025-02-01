@@ -12,9 +12,18 @@ The following operations are implemented:
 * Control - Control a device (`control_device`)
 * State - Get all device status (`get_all_device_status`)
 
+The following devices are supported:
+
+* RELAY QS-D-S5 - Dimmer
+* RELAY QS-R-S5 - Relay
+* RELAY QS-R-S30 - Relay
+
+If you have a different device than these ones, please open an issue with the device model name and type of device.
+
 Device history is *not* implemented in this library yet as I don't have access to these devices.  
 
 If you have access to devices that record history, please open an issue detailing sample responses from `get_all_device_status` and the history calls. 
+
 
 ### Installation
 
@@ -27,16 +36,15 @@ pip install qwikswitch-api
 Sample usage to control a device:
 
 ```python
-from qwikswitch.qsapi import QSApi
+from qwikswitch.client import QSClient
 
-api = QSApi()
-api_keys = api.generate_api_keys('email', 'masterkey')
-api.control_device(api_keys, '@123450', 100)
+client = QSClient('email', 'masterkey')
+client.control_device('@123450', 100)
 ```
 
 To list all current device statuses:
 
 ```python
-devices = api.get_all_device_status(api_keys)
+devices = client.get_all_device_status()
 ```
 
