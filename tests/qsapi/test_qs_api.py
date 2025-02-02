@@ -1,3 +1,5 @@
+"""Base Tests for the QSClient class."""
+
 from qwikswitchapi.client import QSClient
 
 
