@@ -12,7 +12,7 @@ from .utility import ResponseParser, UrlBuilder
 
 
 class QSClient:
-    """The QwiSwitch API client."""
+    """The QwikSwitch API client."""
 
     def _ensure_authenticated(func):  # type: ignore # noqa: N805
         @functools.wraps(func)  # type: ignore
@@ -61,6 +61,20 @@ class QSClient:
         :returns: The base URI of the Qwikswitch API
         """
         return self._base_uri
+
+    @property
+    def api_keys(self) -> ApiKeys | None:
+        """
+        The API keys for the QwikSwitch API.
+
+        :returns: The API keys for the QwikSwitch API
+        """
+        return self._api_keys
+
+    @api_keys.setter
+    def api_keys(self, value: ApiKeys) -> None:
+        """Set the API keys for the QwikSwitch API."""
+        self._api_keys = value
 
     @_handle_request_failure  # type: ignore
     def generate_api_keys(self) -> ApiKeys:
