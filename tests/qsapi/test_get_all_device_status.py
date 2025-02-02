@@ -1,21 +1,25 @@
+"""Tests for the get_all_device_status method of the Qwikswitch API client."""
+
 import pytest
 import requests.exceptions
 
 from qwikswitchapi.constants import DeviceClass
-from qwikswitchapi.exceptions import QSRequestErrorException, QSRequestFailedException
+from qwikswitchapi.exceptions import QSRequestError, QSRequestFailedError
 from qwikswitchapi.utility import UrlBuilder
 
 
-def test_with_valid_credentials_returns_device_statuses(authenticated_api_client, mock_request):
+def test_with_valid_credentials_returns_device_statuses(
+    authenticated_api_client, mock_request
+):
     response = {
-    "success": True,
+        "success": True,
         "@11111a": {
             "type": "RELAY QS-D-S5",
             "hardware": "0x81",
             "firmware": "v3.3",
             "epoch": "1736018165",
             "rssi": "59%",
-            "value": 0
+            "value": 0,
         },
         "@11111b": {
             "type": "RELAY QS-Q-S9",
@@ -23,11 +27,16 @@ def test_with_valid_credentials_returns_device_statuses(authenticated_api_client
             "firmware": "v3.3",
             "epoch": "1736018046",
             "rssi": "58%",
-            "value": 0
-        }
+            "value": 0,
+        },
     }
 
-    mock_request.get(UrlBuilder.build_get_all_device_status_url(authenticated_api_client._api_keys.read_write_key), json=response)
+    mock_request.get(
+        UrlBuilder.build_get_all_device_status_url(
+            authenticated_api_client._api_keys.read_write_key
+        ),
+        json=response,
+    )
 
     devices = authenticated_api_client.get_all_device_status()
 
@@ -46,30 +55,39 @@ def test_with_valid_credentials_returns_device_statuses(authenticated_api_client
 
 
 def test_with_unknown_error_throws_exception(authenticated_api_client, mock_request):
-    mock_request.get(UrlBuilder.build_get_all_device_status_url(authenticated_api_client._api_keys.read_write_key), status_code=401)
+    mock_request.get(
+        UrlBuilder.build_get_all_device_status_url(
+            authenticated_api_client._api_keys.read_write_key
+        ),
+        status_code=401,
+    )
 
-    with pytest.raises(QSRequestErrorException):
+    with pytest.raises(QSRequestError):
         authenticated_api_client.get_all_device_status()
 
-@pytest.mark.parametrize("response", [
-    {
-        "error": "INVALID_API_KEY"
-    },
-    {
-        "success": False
-    }
-])
 
-def test_logical_error_raises_exception(response, authenticated_api_client, mock_request):
-    mock_request.get(UrlBuilder.build_get_all_device_status_url(authenticated_api_client._api_keys.read_write_key),
-                     json=response)
+@pytest.mark.parametrize("response", [{"error": "INVALID_API_KEY"}, {"success": False}])
+def test_logical_error_raises_exception(
+    response, authenticated_api_client, mock_request
+):
+    mock_request.get(
+        UrlBuilder.build_get_all_device_status_url(
+            authenticated_api_client._api_keys.read_write_key
+        ),
+        json=response,
+    )
 
-    with pytest.raises(QSRequestErrorException):
+    with pytest.raises(QSRequestError):
         authenticated_api_client.get_all_device_status()
+
 
 def test_error_raises_exception(authenticated_api_client, mock_request):
-    mock_request.get(UrlBuilder.build_get_all_device_status_url(authenticated_api_client._api_keys.read_write_key),
-                     exc=requests.exceptions.Timeout)
+    mock_request.get(
+        UrlBuilder.build_get_all_device_status_url(
+            authenticated_api_client._api_keys.read_write_key
+        ),
+        exc=requests.exceptions.Timeout,
+    )
 
-    with pytest.raises(QSRequestFailedException):
+    with pytest.raises(QSRequestFailedError):
         authenticated_api_client.get_all_device_status()
