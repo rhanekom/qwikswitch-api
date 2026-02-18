@@ -1,7 +1,7 @@
 {
     "name": "rhanekom/qwikswitch-api",
     "image": "mcr.microsoft.com/devcontainers/python:3.13",
-    "postCreateCommand": "scripts/setup",
+    "postCreateCommand": "/workspaces/qwikswitch-api/.devcontainer/scripts/setup",
     "customizations": {
         "vscode": {
             "extensions": [
