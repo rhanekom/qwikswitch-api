@@ -51,3 +51,7 @@ Tests use `pytest` with `requests-mock` for HTTP mocking. Shared fixtures in `te
 - Ruff is configured with `select = ["ALL"]` (all rules enabled) minus specific exclusions. Test files have relaxed rules for assertions, private member access, and type annotations.
 - Pre-commit hooks run pyupgrade, Black, codespell, and Ruff.
 - Target Python version for linting is 3.12 (`.ruff.toml`), though `pyproject.toml` specifies `>=3.8` compatibility.
+
+## Git Workflow
+
+- Always commit all changed and untracked files together. Do not make partial commits.
