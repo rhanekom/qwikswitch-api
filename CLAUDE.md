@@ -55,3 +55,16 @@ Tests use `pytest` with `requests-mock` for HTTP mocking. Shared fixtures in `te
 ## Git Workflow
 
 - Always commit all changed and untracked files together. Do not make partial commits.
+
+## MCP Launchpad
+
+`mcpl` is a unified CLI for discovering and executing tools across all configured MCP servers. If a task needs a tool or functionality outside your current capabilities, check `mcpl` for it.
+
+Always discover before calling — tool names vary between servers, so never guess them.
+
+```bash
+mcpl search "<query>"              # Find tools across all servers (shows required params)
+mcpl list <server>                 # List a server's tools
+mcpl inspect <server> <tool> --example   # Full schema + ready-to-use example call
+mcpl call <server> <tool> '{"param": "value"}'   # Execute a tool
+```

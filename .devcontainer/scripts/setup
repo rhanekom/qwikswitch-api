@@ -9,8 +9,18 @@ cd "/workspaces/qwikswitch-api"
 # Install project dependencies
 python3 -m pip install --requirement requirements.txt
 
+# Add aliases
+echo 'alias cl="claude --dangerously-skip-permissions"' | tee -a ~/.bashrc ~/.zshrc
+
 # Install the pre-commit hooks
 pre-commit install
 
 # Install Claude Code
 curl -fsSL https://claude.ai/install.sh | bash
+
+# Install uv (required for MCP Launchpad)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+export PATH="$HOME/.local/bin:$PATH"
+
+# Install MCP Launchpad
+uv tool install https://github.com/kenneth-liao/mcp-launchpad.git
