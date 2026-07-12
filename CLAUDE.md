@@ -8,27 +8,35 @@ Python wrapper around the QwikSwitch REST API for controlling home automation de
 
 ## Commands
 
+The project uses [uv](https://docs.astral.sh/uv/) for environment and dependency management. Prefix Python tooling with `uv run` so it resolves against the locked environment.
+
 ```bash
+# Sync the environment (runtime + dev dependency groups) from uv.lock
+uv sync
+
 # Run all tests
-pytest tests
+uv run pytest tests
 
 # Run a single test file
-pytest tests/qsapi/test_control_device.py
+uv run pytest tests/qsapi/test_control_device.py
+
+# Run a single test
+uv run pytest tests/qsapi/test_control_device.py::test_generates_keys
 
 # Run tests with coverage
-pytest --cov=qwikswitchapi tests
+uv run pytest --cov=qwikswitchapi tests
 
-# Lint
-ruff check --fix --exit-non-zero-on-fix .
+# Lint (with autofix)
+uv run ruff check --fix --exit-non-zero-on-fix .
 
 # Format
-ruff format .
+uv run ruff format .
 
 # Run all pre-commit hooks
-pre-commit run --all-files
+uv run pre-commit run --all-files
 
-# Build package
-python -m build
+# Build the package
+uv build
 ```
 
 ## Architecture
@@ -48,19 +56,47 @@ Tests use `pytest` with `requests-mock` for HTTP mocking. Shared fixtures in `te
 
 ## Code Quality
 
-- Ruff is configured with `select = ["ALL"]` (all rules enabled) minus specific exclusions. Test files have relaxed rules for assertions, private member access, and type annotations.
-- Pre-commit hooks run pyupgrade, Black, codespell, and Ruff.
+- Ruff is configured with `select = ["ALL"]` (all rules enabled) minus specific exclusions in `.ruff.toml`. Test files have relaxed rules for assertions, private member access, and type annotations.
+- Pre-commit hooks (`.pre-commit-config.yaml`) enforce file hygiene, secret/key detection, spell-check, Ruff lint + format, markdown/shell/GitHub-Actions linting, and a dependency vulnerability audit. Ruff (with the `UP` rules) supersedes standalone pyupgrade, and `ruff-format` supersedes Black, so neither runs separately.
 - Target Python version for linting is 3.12 (`.ruff.toml`), though `pyproject.toml` specifies `>=3.8` compatibility.
 
-## Git Workflow
+## Working Conventions
 
-- Always commit all changed and untracked files together. Do not make partial commits.
+- **Never auto-commit or push** — always ask first.
+- **Don't branch automatically** — the user handles branching.
+- **No self-attribution** — do not add "Authored by / Generated with Claude Code" or `Co-Authored-By` lines to commits, PRs, or any artifact.
+- **Commit the complete change set** — when committing, include all changed and new files (`git add -A`). Never make partial commits.
+- **Before finalizing a commit, scan for secrets and accidental files** — check the staged diff for credentials/keys and for anything that shouldn't be committed (virtualenvs, config artifacts, scratch files) and stop if found. (`gitleaks` and `detect-private-key` back this up as pre-commit hooks.)
+- **Don't let issues hang** — surface problems proactively; fix low-impact ones directly, ask before fixing high-impact ones. Never bypass failing checks, broken tests, or other issues just to keep going.
+- **Research, don't assume** — verify options (including via web search) rather than assuming APIs/libraries behave as described.
+- **If something can be caught by a pre-commit hook, add it** — prefer enforcing a rule mechanically over relying on memory.
 
-## MCP Launchpad
+## Documentation & Source of Truth
 
-`mcpl` is a unified CLI for discovering and executing tools across all configured MCP servers. If a task needs a tool or functionality outside your current capabilities, check `mcpl` for it.
+- Keep an authoritative design/spec doc and a canonical TODO list; treat them as the source of truth for design decisions and next actions, and keep them current as work lands.
+- Record **why** decisions were taken, not just what — so future work doesn't re-litigate settled choices.
 
-Always discover before calling — tool names vary between servers, so never guess them.
+## Dependencies
+
+- **Single source of truth**: dependencies live in `pyproject.toml`, pinned by `uv.lock`. There is no `requirements.txt`.
+- **Separate runtime from dev/tooling**: runtime dependencies go in `[project.dependencies]`; test, docs, and tooling dependencies go in `[dependency-groups]` (the `dev` group, installed by default via `uv sync`, aggregates the `test` and `docs` groups). Keep each in its designated place — don't mix them.
+- When a dependency is added or bumped, run `uv lock` so the lockfile and every consumer (tests, linters, CI) resolve the same versions.
+- **Scope vulnerability scanning to code we control**: the `pip-audit` pre-commit hook audits only the runtime dependency tree (`uv export --no-dev`), deliberately excluding the large dev/tooling transitive tree.
+
+## Dev Environment
+
+Setup is split by scope so frequently-run setup stays fast:
+
+- **`.devcontainer/Dockerfile`** — machine-wide, rarely-changing installs baked into the image: system (apt) packages and standalone global binaries (`uv`, `gitleaks`, `actionlint`), plus per-user CLI tooling (Claude Code, MCP Launchpad). Every globally-installed tool belongs here so it survives rebuilds.
+- **`.devcontainer/scripts/setup`** — project- and workspace-specific setup that must run against the mounted source (`uv sync`, `pre-commit install`), invoked as the `postCreateCommand`.
+
+Never rely on an ad-hoc install that vanishes on the next rebuild — persist global tools in the Dockerfile, project tools in the setup script.
+
+## MCP / External Capabilities
+
+When a task needs a capability outside the current tools, check the MCP gateway first. `mcpl` is a unified CLI for discovering and executing tools across all configured MCP servers.
+
+Always discover before calling — never guess tool names. Search for the tool, inspect its schema, then call it.
 
 ```bash
 mcpl search "<query>"              # Find tools across all servers (shows required params)
@@ -68,3 +104,13 @@ mcpl list <server>                 # List a server's tools
 mcpl inspect <server> <tool> --example   # Full schema + ready-to-use example call
 mcpl call <server> <tool> '{"param": "value"}'   # Execute a tool
 ```
+
+## Tooling Baseline
+
+- **Linting/formatting**: run format + lint-with-autofix locally (`uv run ruff format .`, `uv run ruff check --fix`). CI, when added, runs check-only (no fixes). *(No CI workflow is configured yet — this is the target.)*
+- **Pre-commit hooks standardized on** (all active in `.pre-commit-config.yaml`): file hygiene (JSON/YAML/TOML validation, whitespace, line endings, private-key + AWS-credential detection), spell-check (codespell), Ruff lint + format, markdown lint (markdownlint-cli2), shell lint (shellcheck), GitHub Actions lint (actionlint), secret scanning (gitleaks), and a dependency vuln audit (pip-audit, runtime tree only).
+- **Testing**: `uv run pytest tests` runs everything; a single file is `uv run pytest tests/qsapi/test_control_device.py`; a single test appends `::test_name`.
+
+## Git Workflow
+
+- Always commit all changed and untracked files together (`git add -A`). Do not make partial commits.

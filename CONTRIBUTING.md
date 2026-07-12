@@ -49,7 +49,6 @@ Use [black](https://github.com/ambv/black) to make sure the code follows the sty
 
 This repository comes with a development environment in a container, easy to launch.  Ensure all tests pass, and add test for any new functionality or changes.
 
-
 ## License
 
 By contributing, you agree that your contributions will be licensed under its MIT License.

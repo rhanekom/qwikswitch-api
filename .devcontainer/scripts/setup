@@ -1,26 +1,16 @@
 #!/usr/bin/env bash
+#
+# Project- and workspace-specific setup, run as the devcontainer postCreateCommand.
+# System-wide tooling (system packages, uv, gitleaks, actionlint, Claude Code,
+# MCP Launchpad) is baked into the image — see .devcontainer/Dockerfile. Only steps
+# that depend on the mounted workspace belong here.
 
-set -e
+set -euo pipefail
 
-sudo apt-get update && sudo apt-get dist-upgrade -y
+cd /workspaces/qwikswitch-api
 
-cd "/workspaces/qwikswitch-api"
+# Sync the project environment (runtime + dev dependency groups) from uv.lock.
+uv sync
 
-# Install project dependencies
-python3 -m pip install --requirement requirements.txt
-
-# Add aliases
-echo 'alias cl="claude --dangerously-skip-permissions"' | tee -a ~/.bashrc ~/.zshrc
-
-# Install the pre-commit hooks
-pre-commit install
-
-# Install Claude Code
-curl -fsSL https://claude.ai/install.sh | bash
-
-# Install uv (required for MCP Launchpad)
-curl -LsSf https://astral.sh/uv/install.sh | sh
-export PATH="$HOME/.local/bin:$PATH"
-
-# Install MCP Launchpad
-uv tool install https://github.com/kenneth-liao/mcp-launchpad.git
+# Install the git pre-commit hooks into this checkout.
+uv run pre-commit install

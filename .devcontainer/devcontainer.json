@@ -1,6 +1,8 @@
 {
     "name": "rhanekom/qwikswitch-api",
-    "image": "mcr.microsoft.com/devcontainers/python:3.13",
+    "build": {
+        "dockerfile": "Dockerfile"
+    },
     "postCreateCommand": "/workspaces/qwikswitch-api/.devcontainer/scripts/setup",
     "customizations": {
         "vscode": {
@@ -29,13 +31,6 @@
     },
     "remoteUser": "vscode",
     "features": {
-        "ghcr.io/devcontainers-extra/features/apt-packages:1": {
-            "packages": [
-                "ffmpeg",
-                "libturbojpeg0",
-                "libpcap-dev"
-            ]
-        },
         "ghcr.io/devcontainers/features/docker-in-docker:2": {
             "moby": false
         }

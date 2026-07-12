@@ -7,6 +7,7 @@ An alternative (local) way of controlling Qwikswitch devices is with a USB Modem
 ## Usage
 
 The following operations are implemented:
+
 * Keys - Generate API Keys (`generate_api_keys`)
 * Keys - Delete API Keys (`delete_api_keys`)
 * Control - Control a device (`control_device`)
@@ -20,10 +21,9 @@ The following devices are supported:
 
 If you have a different device than these ones, please open an issue with the device model name and type of device.
 
-Device history is *not* implemented in this library yet as I don't have access to these devices.  
+Device history is *not* implemented in this library yet as I don't have access to these devices.
 
-If you have access to devices that record history, please open an issue detailing sample responses from `get_all_device_status` and the history calls. 
-
+If you have access to devices that record history, please open an issue detailing sample responses from `get_all_device_status` and the history calls.
 
 ### Installation
 
@@ -47,4 +47,3 @@ To list all current device statuses:
 ```python
 devices = client.get_all_device_status()
 ```
-

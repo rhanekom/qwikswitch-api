@@ -17,19 +17,23 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 dependencies = [
-    "requests"
+    "requests",
 ]
 
-[project.optional-dependencies]
-tests = ["pytest", "pytest-cov", "requests-mock", "pytest-flakes"]
-docs = ["sphinx", "pydata_sphinx_theme"]
+# Development-only dependencies (not shipped in the published wheel). These live in
+# dependency-groups rather than optional-dependencies so they stay out of package
+# metadata; `uv sync` installs the `dev` group by default.
+[dependency-groups]
+test = ["pytest", "pytest-cov", "requests-mock", "pytest-flakes"]
+docs = ["sphinx", "pydata-sphinx-theme"]
 dev = [
-    "packageName[tests, docs]",
+    {include-group = "test"},
+    {include-group = "docs"},
     "build",
-    "twine"
+    "twine",
+    "ruff",
+    "pre-commit",
 ]
-
-[tool]
 
 [tool.hatch.build.targets.wheel]
 packages = ["qwikswitchapi"]
