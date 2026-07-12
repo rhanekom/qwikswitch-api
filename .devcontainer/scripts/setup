@@ -28,8 +28,27 @@ if ! command -v gh >/dev/null 2>&1; then
     sudo chmod +x /usr/local/bin/gh
 fi
 
-# lazygit — terminal UI for git (via Homebrew).
-if [ -x /home/linuxbrew/.linuxbrew/bin/brew ]; then
-    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+# lazygit — terminal UI for git (via Homebrew), plus the system-wide shell wiring
+# that keeps brew on PATH. Both are baked into the image (see Dockerfile); this
+# restores them only if missing, so a stale image or a container whose home dir
+# shadowed the baked ~/.bashrc still ends up with a working brew. Idempotent: a
+# no-op once brew is on PATH and the snippets already exist.
+BREW=/home/linuxbrew/.linuxbrew/bin/brew
+if [ -x "$BREW" ]; then
+    eval "$("$BREW" shellenv)"
     command -v lazygit >/dev/null 2>&1 || brew install lazygit
+
+    # Restore the system-wide shellenv wiring if absent. Kept in sync with the
+    # Dockerfile: profile.d (login), /etc/bash.bashrc (interactive non-login
+    # bash), /etc/zsh/zshenv (zsh). System files need sudo (available here, as
+    # for the gh fallback above).
+    shellenv="eval \"\$($BREW shellenv)\""
+    if [ ! -f /etc/profile.d/homebrew.sh ]; then
+        printf '%s\n' "$shellenv" | sudo tee /etc/profile.d/homebrew.sh >/dev/null
+    fi
+    for rc in /etc/bash.bashrc /etc/zsh/zshenv; do
+        if [ -f "$rc" ] && ! grep -qF 'brew shellenv' "$rc"; then
+            printf '\n# Homebrew\n%s\n' "$shellenv" | sudo tee -a "$rc" >/dev/null
+        fi
+    done
 fi
