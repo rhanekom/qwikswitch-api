@@ -107,7 +107,7 @@ mcpl call <server> <tool> '{"param": "value"}'   # Execute a tool
 
 ## Tooling Baseline
 
-- **Linting/formatting**: run format + lint-with-autofix locally (`uv run ruff format .`, `uv run ruff check --fix`). CI, when added, runs check-only (no fixes). *(No CI workflow is configured yet — this is the target.)*
+- **Linting/formatting**: run format + lint-with-autofix locally (`uv run ruff format .`, `uv run ruff check --fix`). CI (`.github/workflows/ci.yml`) runs check-only — `uv run pre-commit run --all-files` (no autofix) plus the test suite across the supported Python range (3.8/3.11/3.13). The gitleaks/actionlint binary versions are kept in sync between the Dockerfile, pre-commit config, and CI.
 - **Pre-commit hooks standardized on** (all active in `.pre-commit-config.yaml`): file hygiene (JSON/YAML/TOML validation, whitespace, line endings, private-key + AWS-credential detection), spell-check (codespell), Ruff lint + format, markdown lint (markdownlint-cli2), shell lint (shellcheck), GitHub Actions lint (actionlint), secret scanning (gitleaks), and a dependency vuln audit (pip-audit, runtime tree only).
 - **Testing**: `uv run pytest tests` runs everything; a single file is `uv run pytest tests/qsapi/test_control_device.py`; a single test appends `::test_name`.
 

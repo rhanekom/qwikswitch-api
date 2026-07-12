@@ -106,3 +106,12 @@ repos:
         language: system
         pass_filenames: false
         files: ^(uv\.lock|pyproject\.toml)$
+
+      # Run the full test suite when any Python source changes. The suite is fast,
+      # so it runs on every relevant commit rather than only in CI.
+      - id: pytest
+        name: 🧪 pytest
+        entry: uv run pytest tests
+        language: system
+        pass_filenames: false
+        types: [python]
