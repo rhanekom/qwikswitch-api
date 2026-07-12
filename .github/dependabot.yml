@@ -1,17 +1,49 @@
-# To get started with Dependabot version updates, you'll need to specify which
-# package ecosystems to update and where the package manifests are located.
-# Please see the documentation for more information:
-# https://docs.github.com/github/administering-a-repository/configuration-options-for-dependency-updates
-# https://containers.dev/guide/dependabot
-
+# Dependabot version-update configuration.
+# Alerts and automated security fixes are enabled in the repo's security
+# settings; this file adds scheduled version-update PRs on top of those.
+# Docs: https://docs.github.com/en/code-security/dependabot/working-with-dependabot/dependabot-options-reference
 version: 2
 updates:
- - package-ecosystem: "github-actions"
-   directory: "/"
-   schedule:
-     interval: "weekly"
+  # Python dependencies managed by uv (pyproject.toml + uv.lock). The "uv"
+  # ecosystem is required here — "pip" does not track uv.lock.
+  - package-ecosystem: "uv"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Africa/Johannesburg"
+    open-pull-requests-limit: 5
+    groups:
+      # Batch non-major bumps into one PR to cut review noise; majors stay on
+      # their own so breaking changes are reviewed individually.
+      python-minor-and-patch:
+        update-types:
+          - "minor"
+          - "patch"
 
- - package-ecosystem: "pip"
-   directory: "/"
-   schedule:
-     interval: "weekly"
+  # GitHub Actions in the CI workflow (kept SHA-pinned; Dependabot bumps the
+  # pinned SHA and refreshes the trailing version comment).
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Africa/Johannesburg"
+    open-pull-requests-limit: 5
+    groups:
+      github-actions:
+        update-types:
+          - "minor"
+          - "patch"
+
+  # Dev container features (e.g. docker-in-docker), pinned in devcontainer-lock.json.
+  - package-ecosystem: "devcontainers"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Africa/Johannesburg"
+    open-pull-requests-limit: 5
