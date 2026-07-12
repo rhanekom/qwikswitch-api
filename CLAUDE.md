@@ -67,6 +67,7 @@ Tests use `pytest` with `requests-mock` for HTTP mocking. Shared fixtures in `te
 - **No self-attribution** — do not add "Authored by / Generated with Claude Code" or `Co-Authored-By` lines to commits, PRs, or any artifact.
 - **Commit the complete change set** — when committing, include all changed and new files (`git add -A`). Never make partial commits.
 - **Before finalizing a commit, scan for secrets and accidental files** — check the staged diff for credentials/keys and for anything that shouldn't be committed (virtualenvs, config artifacts, scratch files) and stop if found. (`gitleaks` and `detect-private-key` back this up as pre-commit hooks.)
+- **Code must be accompanied by tests** — new functionality or behaviour changes must land with corresponding tests. Don't commit production code changes without them; the `pytest` pre-commit hook and CI run the suite on every relevant change.
 - **Don't let issues hang** — surface problems proactively; fix low-impact ones directly, ask before fixing high-impact ones. Never bypass failing checks, broken tests, or other issues just to keep going.
 - **Research, don't assume** — verify options (including via web search) rather than assuming APIs/libraries behave as described.
 - **If something can be caught by a pre-commit hook, add it** — prefer enforcing a rule mechanically over relying on memory.
