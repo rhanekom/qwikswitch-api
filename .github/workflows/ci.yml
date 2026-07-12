@@ -59,8 +59,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Covers the min, a mid, and the max of requires-python (>=3.8).
-        python-version: ["3.8", "3.11", "3.13"]
+        # Single supported version, matching requires-python (>=3.14) and the
+        # Python that Home Assistant runs on.
+        python-version: ["3.14"]
     steps:
       - uses: actions/checkout@v7
 

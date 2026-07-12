@@ -9,7 +9,7 @@
 # Project- and workspace-dependent setup that must run against the mounted source
 # (uv sync, pre-commit install) lives in scripts/setup, which runs as
 # postCreateCommand.
-FROM mcr.microsoft.com/devcontainers/python:3.13
+FROM mcr.microsoft.com/devcontainers/python:3.14
 
 # --- System packages (apt) -------------------------------------------------
 RUN apt-get update \

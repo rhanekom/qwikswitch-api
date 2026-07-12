@@ -59,7 +59,7 @@ Tests use `pytest` with `requests-mock` for HTTP mocking. Shared fixtures in `te
 - Ruff is configured with `select = ["ALL"]` (all rules enabled) minus specific exclusions in `.ruff.toml`. Test files have relaxed rules for assertions, private member access, and type annotations.
 - **Prefer inline suppression over global ignores**: when a specific warning genuinely needs silencing, add an inline `# noqa: <RULE>` (with a short reason) at the offending line rather than adding the rule to the global `ignore` list in `.ruff.toml`. Blanket/per-directory suppression is acceptable only for the `tests/` and `scripts/` directories (via `per-file-ignores`); everywhere else, suppress at the point of use so the exception stays visible and scoped. (Genuine formatter-incompatibility rules — e.g. `COM812`, `ISC001`, `D203`, `D212` — legitimately remain global.)
 - Pre-commit hooks (`.pre-commit-config.yaml`) enforce file hygiene, secret/key detection, spell-check, Ruff lint + format, markdown/shell/GitHub-Actions linting, and a dependency vulnerability audit. Ruff (with the `UP` rules) supersedes standalone pyupgrade, and `ruff-format` supersedes Black, so neither runs separately.
-- Target Python version for linting is 3.12 (`.ruff.toml`), though `pyproject.toml` specifies `>=3.8` compatibility.
+- Target Python version for linting is 3.14 (`.ruff.toml`), matching `pyproject.toml`'s `requires-python = ">=3.14"` (aligned with the Python version Home Assistant runs on).
 
 ## Working Conventions
 
@@ -109,7 +109,7 @@ mcpl call <server> <tool> '{"param": "value"}'   # Execute a tool
 
 ## Tooling Baseline
 
-- **Linting/formatting**: run format + lint-with-autofix locally (`uv run ruff format .`, `uv run ruff check --fix`). CI (`.github/workflows/ci.yml`) runs check-only — `uv run pre-commit run --all-files` (no autofix) plus the test suite across the supported Python range (3.8/3.11/3.13). The gitleaks/actionlint binary versions are kept in sync between the Dockerfile, pre-commit config, and CI; the `gh` version (`GH_VERSION`) is kept in sync between the Dockerfile and the setup-script fallback.
+- **Linting/formatting**: run format + lint-with-autofix locally (`uv run ruff format .`, `uv run ruff check --fix`). CI (`.github/workflows/ci.yml`) runs check-only — `uv run pre-commit run --all-files` (no autofix) plus the test suite on the supported Python version (3.14). The gitleaks/actionlint binary versions are kept in sync between the Dockerfile, pre-commit config, and CI; the `gh` version (`GH_VERSION`) is kept in sync between the Dockerfile and the setup-script fallback.
 - **Pre-commit hooks standardized on** (all active in `.pre-commit-config.yaml`): file hygiene (JSON/YAML/TOML validation, whitespace, line endings, private-key + AWS-credential detection), spell-check (codespell), Ruff lint + format, markdown lint (markdownlint-cli2), shell lint (shellcheck), GitHub Actions lint (actionlint), secret scanning (gitleaks), and a dependency vuln audit (pip-audit, runtime tree only).
 - **Testing**: `uv run pytest tests` runs everything; a single file is `uv run pytest tests/qsapi/test_control_device.py`; a single test appends `::test_name`.
 

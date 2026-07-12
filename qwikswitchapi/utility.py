@@ -1,9 +1,7 @@
 """Utility methods for handling urls and parsing response messages."""
 
-from typing import Never
+from typing import TYPE_CHECKING, Never
 from urllib.parse import quote_plus, urljoin
-
-from requests import RequestException
 
 from .constants import DEFAULT_BASE_URI
 from .exceptions import (
@@ -11,6 +9,9 @@ from .exceptions import (
     QSRequestError,
     QSRequestFailedError,
 )
+
+if TYPE_CHECKING:
+    from requests import RequestException
 
 
 class ResponseParser:
