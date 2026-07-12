@@ -16,6 +16,9 @@ RUN apt-get update \
         ffmpeg \
         libturbojpeg0 \
         libpcap-dev \
+        build-essential \
+        procps \
+        file \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -36,6 +39,12 @@ RUN curl -fsSL "https://github.com/rhysd/actionlint/releases/download/v${ACTIONL
     | tar -xz -C /usr/local/bin actionlint \
     && chmod +x /usr/local/bin/actionlint
 
+# gh — GitHub CLI; used for PR/issue/API operations against GitHub.
+ARG GH_VERSION=2.96.0
+RUN curl -fsSL "https://github.com/cli/cli/releases/download/v${GH_VERSION}/gh_${GH_VERSION}_linux_amd64.tar.gz" \
+    | tar -xz -C /usr/local/bin --strip-components=2 "gh_${GH_VERSION}_linux_amd64/bin/gh" \
+    && chmod +x /usr/local/bin/gh
+
 # --- Per-user CLI tooling (baked into the vscode user's home) ---------------
 USER vscode
 
@@ -50,5 +59,18 @@ ENV PATH="/home/vscode/.local/bin:${PATH}"
 
 # Convenience alias, baked once so rebuilds don't append duplicate lines.
 RUN echo 'alias cl="claude --dangerously-skip-permissions"' | tee -a ~/.bashrc ~/.zshrc
+
+# --- Homebrew (Linux) + brew-managed tooling --------------------------------
+# Homebrew must be installed by a non-root user with passwordless sudo; it lands
+# in /home/linuxbrew/.linuxbrew, which is baked into the image. NONINTERACTIVE
+# skips the installer's prompts so it runs cleanly during the build.
+RUN NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+# Put brew on PATH for interactive shells (baked once) and for subsequent builds.
+RUN echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' | tee -a ~/.bashrc ~/.zshrc ~/.profile
+ENV PATH="/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:${PATH}"
+
+# lazygit — terminal UI for git; installed via Homebrew.
+RUN brew install lazygit
 
 USER root

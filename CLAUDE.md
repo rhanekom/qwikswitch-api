@@ -57,6 +57,7 @@ Tests use `pytest` with `requests-mock` for HTTP mocking. Shared fixtures in `te
 ## Code Quality
 
 - Ruff is configured with `select = ["ALL"]` (all rules enabled) minus specific exclusions in `.ruff.toml`. Test files have relaxed rules for assertions, private member access, and type annotations.
+- **Prefer inline suppression over global ignores**: when a specific warning genuinely needs silencing, add an inline `# noqa: <RULE>` (with a short reason) at the offending line rather than adding the rule to the global `ignore` list in `.ruff.toml`. Blanket/per-directory suppression is acceptable only for the `tests/` and `scripts/` directories (via `per-file-ignores`); everywhere else, suppress at the point of use so the exception stays visible and scoped. (Genuine formatter-incompatibility rules — e.g. `COM812`, `ISC001`, `D203`, `D212` — legitimately remain global.)
 - Pre-commit hooks (`.pre-commit-config.yaml`) enforce file hygiene, secret/key detection, spell-check, Ruff lint + format, markdown/shell/GitHub-Actions linting, and a dependency vulnerability audit. Ruff (with the `UP` rules) supersedes standalone pyupgrade, and `ruff-format` supersedes Black, so neither runs separately.
 - Target Python version for linting is 3.12 (`.ruff.toml`), though `pyproject.toml` specifies `>=3.8` compatibility.
 
@@ -88,10 +89,10 @@ Tests use `pytest` with `requests-mock` for HTTP mocking. Shared fixtures in `te
 
 Setup is split by scope so frequently-run setup stays fast:
 
-- **`.devcontainer/Dockerfile`** — machine-wide, rarely-changing installs baked into the image: system (apt) packages and standalone global binaries (`uv`, `gitleaks`, `actionlint`), plus per-user CLI tooling (Claude Code, MCP Launchpad). Every globally-installed tool belongs here so it survives rebuilds.
-- **`.devcontainer/scripts/setup`** — project- and workspace-specific setup that must run against the mounted source (`uv sync`, `pre-commit install`), invoked as the `postCreateCommand`.
+- **`.devcontainer/Dockerfile`** — machine-wide, rarely-changing installs baked into the image: system (apt) packages and standalone global binaries (`uv`, `gitleaks`, `actionlint`, `gh`), per-user CLI tooling (Claude Code, MCP Launchpad), and Homebrew plus its brew-managed tools (`lazygit`). Every globally-installed tool's primary install belongs here so it survives rebuilds.
+- **`.devcontainer/scripts/setup`** — project- and workspace-specific setup that must run against the mounted source (`uv sync`, `pre-commit install`), invoked as the `postCreateCommand`. It also carries **idempotent ensure-installed fallbacks** for the developer CLIs (`gh`, `lazygit`) that re-install them only if the baked copy is missing; these must stay no-ops when the tools already exist.
 
-Never rely on an ad-hoc install that vanishes on the next rebuild — persist global tools in the Dockerfile, project tools in the setup script.
+The Dockerfile is the source of truth for global tools — never rely on an ad-hoc install that vanishes on the next rebuild. The setup-script fallbacks are a safety net, not the primary install, and must be kept in sync with the Dockerfile (e.g. `GH_VERSION`).
 
 ## MCP / External Capabilities
 
@@ -108,7 +109,7 @@ mcpl call <server> <tool> '{"param": "value"}'   # Execute a tool
 
 ## Tooling Baseline
 
-- **Linting/formatting**: run format + lint-with-autofix locally (`uv run ruff format .`, `uv run ruff check --fix`). CI (`.github/workflows/ci.yml`) runs check-only — `uv run pre-commit run --all-files` (no autofix) plus the test suite across the supported Python range (3.8/3.11/3.13). The gitleaks/actionlint binary versions are kept in sync between the Dockerfile, pre-commit config, and CI.
+- **Linting/formatting**: run format + lint-with-autofix locally (`uv run ruff format .`, `uv run ruff check --fix`). CI (`.github/workflows/ci.yml`) runs check-only — `uv run pre-commit run --all-files` (no autofix) plus the test suite across the supported Python range (3.8/3.11/3.13). The gitleaks/actionlint binary versions are kept in sync between the Dockerfile, pre-commit config, and CI; the `gh` version (`GH_VERSION`) is kept in sync between the Dockerfile and the setup-script fallback.
 - **Pre-commit hooks standardized on** (all active in `.pre-commit-config.yaml`): file hygiene (JSON/YAML/TOML validation, whitespace, line endings, private-key + AWS-credential detection), spell-check (codespell), Ruff lint + format, markdown lint (markdownlint-cli2), shell lint (shellcheck), GitHub Actions lint (actionlint), secret scanning (gitleaks), and a dependency vuln audit (pip-audit, runtime tree only).
 - **Testing**: `uv run pytest tests` runs everything; a single file is `uv run pytest tests/qsapi/test_control_device.py`; a single test appends `::test_name`.
 

@@ -2,8 +2,9 @@
 #
 # Project- and workspace-specific setup, run as the devcontainer postCreateCommand.
 # System-wide tooling (system packages, uv, gitleaks, actionlint, Claude Code,
-# MCP Launchpad) is baked into the image — see .devcontainer/Dockerfile. Only steps
-# that depend on the mounted workspace belong here.
+# MCP Launchpad, gh, Homebrew + lazygit) is baked into the image — see
+# .devcontainer/Dockerfile. Only steps that depend on the mounted workspace, plus
+# the idempotent developer-CLI fallbacks below, belong here.
 
 set -euo pipefail
 
@@ -14,3 +15,21 @@ uv sync
 
 # Install the git pre-commit hooks into this checkout.
 uv run pre-commit install
+
+# Developer CLIs are baked into the image (see Dockerfile); re-install here only
+# if missing — a cheap safety net for images/rebuilds where the baked copy isn't
+# present. These blocks are idempotent no-ops when the tools already exist.
+
+# gh — GitHub CLI (pinned standalone binary; keep GH_VERSION in sync with the Dockerfile).
+if ! command -v gh >/dev/null 2>&1; then
+    GH_VERSION=2.96.0
+    curl -fsSL "https://github.com/cli/cli/releases/download/v${GH_VERSION}/gh_${GH_VERSION}_linux_amd64.tar.gz" \
+        | sudo tar -xz -C /usr/local/bin --strip-components=2 "gh_${GH_VERSION}_linux_amd64/bin/gh"
+    sudo chmod +x /usr/local/bin/gh
+fi
+
+# lazygit — terminal UI for git (via Homebrew).
+if [ -x /home/linuxbrew/.linuxbrew/bin/brew ]; then
+    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+    command -v lazygit >/dev/null 2>&1 || brew install lazygit
+fi
