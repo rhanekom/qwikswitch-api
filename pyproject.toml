@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "qwikswitch_api"
-version = "0.0.11"
+version = "0.0.12"
 authors = [
   { name="Riaan Hanekom", email="riaan@hanekom.io" },
 ]
