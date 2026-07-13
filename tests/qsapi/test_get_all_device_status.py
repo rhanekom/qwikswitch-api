@@ -4,7 +4,12 @@ import pytest
 import requests.exceptions
 
 from qwikswitchapi.constants import DeviceClass
-from qwikswitchapi.exceptions import QSRequestError, QSRequestFailedError
+from qwikswitchapi.entities import DeviceStatus
+from qwikswitchapi.exceptions import (
+    QSRequestError,
+    QSRequestFailedError,
+    QSResponseParseError,
+)
 from qwikswitchapi.utility import UrlBuilder
 
 
@@ -50,6 +55,18 @@ def test_with_valid_credentials_returns_device_statuses(
     assert devices.statuses[0].rssi == 59
     assert devices.statuses[1].rssi == 58
 
+    assert devices.statuses[0].device_type == "RELAY QS-D-S5"
+    assert devices.statuses[1].device_type == "RELAY QS-Q-S9"
+
+    assert devices.statuses[0].firmware == "v3.3"
+    assert devices.statuses[1].firmware == "v3.3"
+
+    assert devices.statuses[0].epoch == 1736018165
+    assert devices.statuses[1].epoch == 1736018046
+
+    assert devices.statuses[0].value == 0
+    assert devices.statuses[1].value == 0
+
     assert devices.statuses[0].device_class == DeviceClass.dimmer
     assert devices.statuses[1].device_class == DeviceClass.unknown
 
@@ -91,3 +108,28 @@ def test_error_raises_exception(authenticated_api_client, mock_request):
 
     with pytest.raises(QSRequestFailedError):
         authenticated_api_client.get_all_device_status()
+
+
+def test_device_status_from_json_rejects_multiple_devices():
+    """DeviceStatus.from_json guards against being handed more than one device."""
+    json_data = {
+        "@11111a": {
+            "type": "RELAY QS-D-S5",
+            "hardware": "0x81",
+            "firmware": "v3.3",
+            "epoch": "1736018165",
+            "rssi": "59%",
+            "value": 0,
+        },
+        "@11111b": {
+            "type": "RELAY QS-Q-S9",
+            "hardware": "0x81",
+            "firmware": "v3.3",
+            "epoch": "1736018046",
+            "rssi": "58%",
+            "value": 0,
+        },
+    }
+
+    with pytest.raises(QSResponseParseError):
+        DeviceStatus.from_json(json_data)

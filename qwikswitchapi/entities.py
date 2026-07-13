@@ -233,7 +233,7 @@ class DeviceStatus:
             device_id,
             state_json_data[JsonKeys.TYPE],
             state_json_data[JsonKeys.FIRMWARE],
-            state_json_data[JsonKeys.EPOCH],
+            int(state_json_data[JsonKeys.EPOCH]),
             rssi,
             state_json_data[JsonKeys.VALUE],
         )
