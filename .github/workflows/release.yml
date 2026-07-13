@@ -1,0 +1,87 @@
+name: Release
+
+# Publish to PyPI via Trusted Publishing (OIDC) when a release tag is pushed.
+# No API token is stored anywhere — PyPI verifies this workflow's OIDC identity
+# instead. The matching trusted publisher must be configured once on PyPI (see
+# RELEASING.md) with:
+#   owner: rhanekom, repository: qwikswitch-api,
+#   workflow: release.yml, environment: pypi
+#
+# Release tags follow the project scheme (no "v" prefix), e.g. 0.0.12, and must
+# match the version in pyproject.toml (enforced below).
+
+on:
+  push:
+    tags:
+      - "[0-9]+.[0-9]+.[0-9]+"
+
+permissions:
+  contents: read
+
+concurrency:
+  # Don't cancel an in-progress publish; a partial upload to PyPI is best avoided.
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  # Keep in sync with .github/workflows/ci.yml, .devcontainer/Dockerfile and
+  # .pre-commit-config.yaml.
+  UV_VERSION: "0.11.28"
+
+jobs:
+  build:
+    name: Build and test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990 # v8.3.2
+        with:
+          version: ${{ env.UV_VERSION }}
+          enable-cache: true
+
+      - name: Verify the tag matches the pyproject version
+        # Guard against publishing a tag whose name disagrees with the version
+        # baked into the built artifacts.
+        run: |
+          tag="${GITHUB_REF_NAME}"
+          proj="$(uv version --short)"
+          if [ "$tag" != "$proj" ]; then
+            echo "::error::Tag '$tag' does not match pyproject version '$proj'"
+            exit 1
+          fi
+
+      - name: Run tests
+        run: uv run pytest tests
+
+      - name: Build sdist and wheel
+        run: uv build
+
+      - name: Upload distribution artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+          if-no-files-found: error
+
+  publish:
+    name: Publish to PyPI
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/qwikswitch-api/
+    permissions:
+      # OIDC token used by Trusted Publishing; this is the only elevated
+      # permission the release needs, and it is scoped to this job alone.
+      id-token: write
+    steps:
+      - name: Download distribution artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@cef221092ed1bacb1cc03d23a2d87d1d172e277b # v1.14.0
