@@ -43,7 +43,7 @@ People *love* thorough bug reports. I'm not even kidding.
 
 ## Use a Consistent Coding Style
 
-Use [black](https://github.com/ambv/black) to make sure the code follows the style.  A precommit hook is installed with the development environment to help ensure consistency in commits.
+Use [Ruff](https://docs.astral.sh/ruff/) to format and lint the code (`uv run ruff format .` and `uv run ruff check --fix`). Pre-commit hooks are installed with the development environment to enforce this on every commit.
 
 ## Test your code modification
 

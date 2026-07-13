@@ -61,6 +61,13 @@ Tests use `pytest` with `requests-mock` for HTTP mocking. Shared fixtures in `te
 - Pre-commit hooks (`.pre-commit-config.yaml`) enforce file hygiene, secret/key detection, spell-check, Ruff lint + format, markdown/shell/GitHub-Actions linting, and a dependency vulnerability audit. Ruff (with the `UP` rules) supersedes standalone pyupgrade, and `ruff-format` supersedes Black, so neither runs separately.
 - Target Python version for linting is 3.14 (`.ruff.toml`), matching `pyproject.toml`'s `requires-python = ">=3.14"` (aligned with the Python version Home Assistant runs on).
 
+## Python Version Support
+
+- **`requires-python = ">=3.14"`**, chosen to track the Python version Home Assistant runs on. HA supports a single Python minor at a time (the latest): HA 2026.7 requires `>=3.14.2`. Historically HA 2024.12 → 3.12, later → 3.13, 2026.7 → 3.14.
+- **Keep these four in lockstep** whenever the floor changes: `pyproject.toml` `requires-python`, `.ruff.toml` `target-version`, the CI `python-version` matrix (`.github/workflows/ci.yml`), and the devcontainer base image (`.devcontainer/Dockerfile` `FROM …/python:<X>`).
+- **Cross-repo coordination (important):** this library is consumed by the separate Home Assistant integration repo **`hass-qwikswitch-api`**, which declares its minimum HA version in `hacs.json` (`"homeassistant"`) and pins this package in `custom_components/qwikswitch_api/manifest.json` (`requirements`). The library's Python floor must be installable on **every** HA version that integration supports (each HA release has its own `requires_python`). So do **not** change this floor in isolation — coordinate the integration's `hacs.json` HA floor and `manifest.json` pin so they stay compatible. The `>=3.14` choice intentionally tracks the *latest* HA; the integration's HA floor is being raised to match (handled in that repo).
+- **PEP 649 caveat:** `qwikswitchapi/utility.py` imports `requests.RequestException` under `if TYPE_CHECKING:` (type-only). This is safe **only** because Python ≥3.14 defers annotation evaluation (PEP 649). If the floor is ever lowered below 3.14, add `from __future__ import annotations` to that module or the `ex: RequestException` annotation will raise `NameError` at runtime (and ruff's `TC002` autofix will no longer apply).
+
 ## Working Conventions
 
 - **Never auto-commit or push** — always ask first.
@@ -84,6 +91,10 @@ Tests use `pytest` with `requests-mock` for HTTP mocking. Shared fixtures in `te
 - **Separate runtime from dev/tooling**: runtime dependencies go in `[project.dependencies]`; test, docs, and tooling dependencies go in `[dependency-groups]` (the `dev` group, installed by default via `uv sync`, aggregates the `test` and `docs` groups). Keep each in its designated place — don't mix them.
 - When a dependency is added or bumped, run `uv lock` so the lockfile and every consumer (tests, linters, CI) resolve the same versions.
 - **Scope vulnerability scanning to code we control**: the `pip-audit` pre-commit hook audits only the runtime dependency tree (`uv export --no-dev`), deliberately excluding the large dev/tooling transitive tree.
+- **Two complementary layers of vuln scanning** — don't expect either alone to be complete:
+  - `pip-audit` (pre-commit) — **runtime tree only**, queried against the **PyPI** advisory DB. It will **miss** advisories that live only in the **GitHub Advisory Database (GHSA)**; this is an accepted limitation, not a bug to "fix".
+  - **GitHub Dependabot** — covers the **full** dependency graph and GHSA data. Alerts + automated security fixes are enabled at the repo level; version-update config is in `.github/dependabot.yml` (ecosystems: `uv`, `github-actions`, `devcontainers`; non-major bumps grouped, weekly). Dependabot scans the **default branch (`main`)**, so a dependency fix only clears alerts once it lands on `main` (a fix sitting on `develop` won't).
+  - Query alerts with `gh api repos/<owner>/<repo>/dependabot/alerts` (needs alerts enabled + `repo` scope).
 
 ## Dev Environment
 
@@ -112,6 +123,8 @@ mcpl call <server> <tool> '{"param": "value"}'   # Execute a tool
 - **Linting/formatting**: run format + lint-with-autofix locally (`uv run ruff format .`, `uv run ruff check --fix`). CI (`.github/workflows/ci.yml`) runs check-only — `uv run pre-commit run --all-files` (no autofix) plus the test suite on the supported Python version (3.14). The gitleaks/actionlint binary versions are kept in sync between the Dockerfile, pre-commit config, and CI; the `gh` version (`GH_VERSION`) is kept in sync between the Dockerfile and the setup-script fallback.
 - **Pre-commit hooks standardized on** (all active in `.pre-commit-config.yaml`): file hygiene (JSON/YAML/TOML validation, whitespace, line endings, private-key + AWS-credential detection), spell-check (codespell), Ruff lint + format, markdown lint (markdownlint-cli2), shell lint (shellcheck), GitHub Actions lint (actionlint), secret scanning (gitleaks), and a dependency vuln audit (pip-audit, runtime tree only).
 - **Testing**: `uv run pytest tests` runs everything; a single file is `uv run pytest tests/qsapi/test_control_device.py`; a single test appends `::test_name`.
+- **Pin third-party GitHub Actions to a full commit SHA** with a trailing `# vX.Y.Z` comment (SonarQube `githubactions:S7637`). GitHub-owned `actions/*` are exempt. Resolve a tag's SHA with `gh api repos/<owner>/<repo>/git/ref/tags/<tag>`.
+- **SonarQube** analyzes the code (project `rhanekom_qwikswitch-api`, reachable via the `sonarqube` MCP server through `mcpl`). Notable standing decisions: the Dockerfile's trailing `USER root` is intentional (devcontainer feature installs run as root; `remoteUser` is `vscode`) and is marked **Accepted** for `docker:S6471` — don't "fix" it; consecutive `RUN` instructions are merged per `docker:S7031`.
 
 ## Git Workflow
 
