@@ -156,8 +156,7 @@ QSError
 
 ## Contributing
 
-Issues and pull requests are welcome. See [`RELEASING.md`](RELEASING.md) for how releases
-are published to PyPI.
+Issues and pull requests are welcome.
 
 ## License
 

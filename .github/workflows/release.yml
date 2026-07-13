@@ -2,8 +2,7 @@ name: Release
 
 # Publish to PyPI via Trusted Publishing (OIDC) when a release tag is pushed.
 # No API token is stored anywhere — PyPI verifies this workflow's OIDC identity
-# instead. The matching trusted publisher must be configured once on PyPI (see
-# RELEASING.md) with:
+# instead. The matching trusted publisher must be configured once on PyPI with:
 #   owner: rhanekom, repository: qwikswitch-api,
 #   workflow: release.yml, environment: pypi
 #
@@ -14,9 +13,6 @@ on:
   push:
     tags:
       - "[0-9]+.[0-9]+.[0-9]+"
-
-permissions:
-  contents: read
 
 concurrency:
   # Don't cancel an in-progress publish; a partial upload to PyPI is best avoided.
@@ -32,6 +28,10 @@ jobs:
   build:
     name: Build and test
     runs-on: ubuntu-latest
+    permissions:
+      # Only the checkout needs repository read access; scope it to this job
+      # rather than the whole workflow (least privilege).
+      contents: read
     steps:
       - uses: actions/checkout@v7
 
